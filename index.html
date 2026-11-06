@@ -1,0 +1,608 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dushi Vacation Store</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap">
+<style>
+/* Layout: tienda en línea de una columna ancha; arena como fondo cálido, navy para texto y bloques de cierre, coral solo en botones. Una sola identidad (el manual no define modo oscuro). */
+:root{
+  --arena:#F3E6CF; --sol:#FCA62A; --coral:#F96C4F; --aqua:#1A9E9C; --navy:#0E203E;
+  --paper:#FFFFFF; --arena-2:#EADBBE; --muted:#4A5873; --line:#D9C9AB;
+  --font:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--arena);color:var(--navy);font-family:var(--font);font-size:15px;line-height:1.55}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.05;letter-spacing:-.02em}
+.eyebrow{font-weight:700;font-size:12px;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:28px;height:3px;background:var(--aqua);border-radius:2px}
+
+/* anuncio */
+.promo{background:var(--navy);color:var(--arena);font-size:12.5px;font-weight:600;letter-spacing:.04em}
+.promo .wrap{display:flex;justify-content:center;gap:10px 28px;flex-wrap:wrap;padding-block:9px;text-align:center}
+.promo b{color:var(--sol);font-weight:800}
+
+/* header */
+header{background:var(--paper);position:sticky;top:env(safe-area-inset-top,0px);z-index:20;border-bottom:3px solid var(--navy)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--paper);z-index:30}
+.bar{display:flex;align-items:center;gap:24px;padding-block:12px}
+.logo img{height:52px;width:auto;display:block}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:var(--arena);border-radius:999px;padding:0 18px;height:46px;max-width:460px;margin-inline:auto}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:500 14px var(--font);color:var(--navy);height:100%;outline:0}
+.search input::placeholder{color:var(--muted)}
+.search:focus-within{box-shadow:0 0 0 3px var(--navy)}
+.tools{display:flex;gap:8px}
+.ico{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid var(--navy);background:var(--paper);display:grid;place-items:center;color:var(--navy)}
+.ico:hover{background:var(--sol)}
+.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;border-radius:11px;background:var(--coral);color:var(--navy);font-weight:800;font-size:12px;display:grid;place-items:center;padding-inline:5px;border:2px solid var(--paper)}
+nav.main{border-top:1px solid var(--line)}
+nav.main ul{list-style:none;margin:0;padding:0;display:flex;gap:6px 26px;overflow-x:auto;scrollbar-width:none}
+nav.main a{display:block;padding:12px 0;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;border-bottom:3px solid transparent}
+nav.main a:hover,nav.main a[aria-current]{border-bottom-color:var(--coral)}
+nav.main li:last-child{margin-left:auto}
+nav.main li:last-child a{color:var(--navy);background:var(--sol);border-radius:999px;padding:6px 14px;margin-block:6px;border-bottom:0}
+
+
+
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:14px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:16px 28px;border:2px solid var(--navy);transition:transform .15s,box-shadow .15s}
+.btn.pri{background:var(--coral);color:var(--navy);box-shadow:4px 4px 0 var(--navy)}
+.btn.pri:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--navy)}
+.btn.sec{background:transparent;color:var(--navy)}
+.btn.sec:hover{background:var(--navy);color:var(--arena)}
+/* hero carrusel */
+.hero{position:relative;background:var(--navy)}
+.car{position:relative;overflow:hidden;color:var(--arena)}
+.track{display:flex;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.slide{flex:0 0 100%;min-height:clamp(480px,46vw,600px);position:relative;display:grid;align-items:center}
+.slide .wrap{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(20px,4vw,56px);align-items:center;padding-block:clamp(36px,5vw,64px) clamp(64px,7vw,88px);width:100%}
+.slide h1,.slide h2{font-weight:800;font-size:clamp(32px,4.4vw,58px);margin-block:16px 18px}
+.slide h2{font-size:clamp(30px,3.7vw,48px)}
+.slide p{font-size:clamp(16px,1.4vw,19px);max-width:44ch;margin:0 0 26px;font-weight:500}
+.slide .eyebrow{color:inherit}
+.s-video{background:var(--navy);color:#fff}
+.s-video video,.s-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.s-video::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,32,62,.86) 0%,rgba(14,32,62,.55) 45%,rgba(14,32,62,.12) 100%)}
+.s-video .wrap{grid-template-columns:1fr}
+.s-video h1 em{font-style:normal;color:var(--sol)}
+.s-video .eyebrow::before{background:var(--sol)}
+.s-video .eyebrow{color:var(--sol)}
+.s-video .btn.pri{box-shadow:4px 4px 0 var(--sol);border-color:var(--sol)}
+.s-video .btn.sec{color:#fff;border-color:#fff}
+.s-video .btn.sec:hover{background:#fff;color:var(--navy)}
+.s-coral{background:var(--coral);color:var(--navy)}
+.s-aqua{background:var(--aqua);color:var(--navy)}
+.s-sol{background:var(--sol);color:var(--navy)}
+.s-coral .eyebrow::before,.s-aqua .eyebrow::before,.s-sol .eyebrow::before{background:var(--navy)}
+.slide .btn.pri{background:var(--coral);color:var(--navy)}
+.s-coral .btn.pri{background:var(--navy);color:var(--arena);box-shadow:4px 4px 0 var(--arena)}
+.s-coral .btn.pri:hover{box-shadow:6px 6px 0 var(--arena)}
+.pf{position:relative;aspect-ratio:1/1;max-height:460px;margin-inline:auto;width:100%}
+.pf .ph{position:absolute;inset:0;border-radius:999px 999px 28px 28px;overflow:hidden;border:3px solid var(--navy);background:var(--arena)}
+.pf .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pf .price-arc{left:auto;right:-10px;bottom:18px;width:128px}
+.pf .price-arc b{font-size:28px}
+.mark{position:absolute;left:-6px;top:10px;background:var(--navy);color:var(--sol);font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:7px 12px;border-radius:999px;z-index:3;transform:rotate(-4deg)}
+.car-ui{position:absolute;left:0;right:0;bottom:26px;z-index:5;pointer-events:none}
+.car-ui .wrap{display:flex;align-items:center;gap:14px;pointer-events:none}
+.dots{display:flex;gap:8px}
+.dot{pointer-events:auto;width:34px;height:8px;border-radius:4px;border:0;padding:0;background:rgba(255,255,255,.55);position:relative;overflow:hidden}
+.dot::after{content:"";position:absolute;inset:0;background:var(--sol);transform:scaleX(0);transform-origin:left}
+.dot[aria-current="true"]{background:rgba(255,255,255,.35)}
+.dot[aria-current="true"]::after{transform:scaleX(1);transition:transform var(--dur,6s) linear}
+.dot.paused[aria-current="true"]::after{transition:none}
+.cbtn{pointer-events:auto;margin-left:auto;display:flex;gap:8px}
+.cbtn button{width:44px;height:44px;border-radius:50%;border:2px solid var(--navy);background:var(--paper);color:var(--navy);display:grid;place-items:center}
+.cbtn button:hover{background:var(--sol)}
+.cbtn .pp{margin-right:6px}
+.waves{display:block;width:100%;height:46px;background:var(--aqua)}
+
+/* genero + categorias */
+.gen{background:var(--navy);color:var(--arena)}
+.gen ul{list-style:none;margin:0;padding:0;display:flex;gap:4px 8px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.gen button{background:transparent;border:0;color:inherit;font-weight:800;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;padding:11px 14px;border-bottom:3px solid transparent;white-space:nowrap}
+.gen button:hover{color:var(--sol)}
+.gen button[aria-pressed="true"]{border-bottom-color:var(--sol);color:var(--sol)}
+.gen li:last-child{margin-left:auto;font-size:12px;font-weight:600;white-space:nowrap;opacity:.9}
+nav.main button{background:none;border:0;color:inherit;display:block;padding:12px 0;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;border-bottom:3px solid transparent}
+nav.main button:hover,nav.main button[aria-pressed="true"]{border-bottom-color:var(--coral)}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.toolbar .count{font-weight:700;font-size:14px}
+.toolbar select{font:700 13px var(--font);color:var(--navy);border:2px solid var(--navy);background:var(--paper);border-radius:999px;padding:9px 14px}
+.chipsrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chipsrow .lbl{font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-right:4px}
+.empty{padding:40px 0;font-weight:700}
+
+/* alianzas */
+.ali{background:var(--arena)}
+.ali .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+.step{border:2px solid var(--navy);border-radius:22px;background:var(--paper);padding:22px 20px;display:flex;flex-direction:column;gap:10px}
+.step b.n{width:40px;height:40px;border-radius:50%;background:var(--navy);color:var(--sol);display:grid;place-items:center;font-weight:800}
+.step h3{font-size:19px;font-weight:800;letter-spacing:0}
+.step p{margin:0;font-size:14px;color:var(--muted);font-weight:500}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+.slot{aspect-ratio:3/2;border:2px dashed var(--navy);border-radius:20px;display:grid;place-content:center;text-align:center;padding:10px;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.55)}
+.slot small{display:block;font-weight:600;letter-spacing:0;text-transform:none;font-size:12px;color:var(--muted);margin-top:4px}
+.slot.ex{border-style:solid;background:var(--aqua);color:var(--navy)}
+.slot.ex small{color:var(--navy)}
+.ali .cta{margin-top:28px}
+
+/* pie */
+.pay{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.pay span{border:1.5px solid rgba(243,230,207,.5);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700}
+.nombre{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.nombre span{background:var(--navy);border:1.5px solid rgba(243,230,207,.35);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:500}
+.nombre b{color:var(--sol);font-weight:800}
+.nombre span.sv{background:var(--coral);border-color:var(--coral);color:var(--navy)}
+.nombre span.sv b{color:var(--navy)}
+
+/* planes */
+section{padding-block:clamp(44px,6vw,80px)}
+.head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:32px}
+.head h2{font-weight:800;font-size:clamp(28px,3.6vw,46px);margin-top:12px}
+.head a.more{font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;border-bottom:3px solid var(--coral);padding-bottom:3px}
+.plans{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.plan{border:2px solid var(--navy);border-radius:22px;padding:20px 18px 18px;display:flex;flex-direction:column;gap:14px;min-height:210px;transition:transform .15s}
+.plan:hover{transform:translateY(-4px)}
+.plan svg{width:52px;height:52px}
+.plan h3{font-size:20px;font-weight:800}
+.plan small{font-size:12.5px;font-weight:500;line-height:1.4;display:block;margin-top:4px}
+.plan .go{margin-top:auto;font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.p1{background:var(--aqua)}.p2{background:var(--paper)}.p3{background:var(--sol)}.p4{background:var(--paper)}.p5{background:var(--coral)}
+.plan.p1,.plan.p3,.plan.p5{color:var(--navy)}
+
+/* productos */
+.prods{background:var(--paper);border-block:3px solid var(--navy)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{border:2px solid var(--navy);background:transparent;color:var(--navy);font-weight:700;font-size:13px;border-radius:999px;padding:8px 16px}
+.tab[aria-pressed="true"]{background:var(--navy);color:var(--arena)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px 20px}
+.card{display:flex;flex-direction:column;gap:12px;min-width:0}
+.thumb{position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;border:2px solid var(--navy);display:grid;place-items:center}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb svg.g{width:56%;height:auto;position:relative}
+.tag{position:absolute;left:12px;top:12px;background:var(--navy);color:var(--arena);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px;z-index:2}
+.tag.sol{background:var(--sol);color:var(--navy)}
+.fav{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;border:2px solid var(--navy);background:var(--paper);display:grid;place-items:center;z-index:2;color:var(--navy)}
+.fav[aria-pressed="true"]{background:var(--coral)}
+.fav[aria-pressed="true"] svg{fill:var(--navy)}
+.meta{display:flex;flex-direction:column;gap:2px}
+.brand{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.card h3{font-size:16px;font-weight:700;letter-spacing:0;line-height:1.25}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+.price{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.price s{font-weight:500;font-size:13px;color:var(--muted);margin-left:6px}
+.add{border:2px solid var(--navy);background:var(--coral);color:var(--navy);font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:9px 14px;white-space:nowrap}
+.add:hover{background:var(--sol)}
+.add.done{background:var(--aqua)}
+.swatch{display:flex;gap:6px}
+.swatch i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--navy)}
+
+/* campaña */
+.camp{background:var(--navy);color:var(--arena);padding-block:0;overflow:hidden}
+.camp .wrap{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,60px);align-items:center;padding-block:clamp(40px,6vw,80px)}
+.camp h2{font-weight:800;font-size:clamp(32px,4.4vw,58px);color:#fff;margin-block:14px 18px}
+.camp h2 em{font-style:normal;color:var(--sol)}
+.camp p{max-width:44ch;font-weight:500;margin:0 0 26px}
+.camp .eyebrow{color:var(--sol)}.camp .eyebrow::before{background:var(--sol)}
+.camp .btn.pri{box-shadow:4px 4px 0 var(--sol);border-color:var(--sol)}
+.camp .btn.pri:hover{box-shadow:6px 6px 0 var(--sol)}
+.arch{position:relative;aspect-ratio:1.15/1;border-radius:26px;overflow:hidden;border:3px solid var(--arena)}
+.arch img{width:100%;height:100%;object-fit:cover;display:block}
+.price-arc{position:absolute;left:18px;bottom:18px;width:150px;aspect-ratio:1;border-radius:50%;background:var(--sol);color:var(--navy);display:grid;place-content:center;text-align:center;border:3px solid var(--navy);transform:rotate(-8deg)}
+.price-arc small{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.price-arc b{font-size:34px;font-weight:900;line-height:1}
+.price-arc span{font-size:11px;font-weight:600}
+
+/* promesas */
+.vals{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.val{display:flex;flex-direction:column;gap:10px}
+.val .n{width:48px;height:48px;border-radius:50%;background:var(--aqua);border:2px solid var(--navy);display:grid;place-items:center}
+.val h3{font-size:17px;font-weight:800;letter-spacing:0}
+.val p{margin:0;font-size:14px;color:var(--muted);font-weight:500}
+
+/* newsletter */
+.news{background:var(--sol);border-block:3px solid var(--navy);padding-block:clamp(32px,4vw,52px)}
+.news .wrap{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:center;justify-content:space-between}
+.news h2{font-size:clamp(24px,3vw,36px);font-weight:800;max-width:20ch}
+.news form{display:flex;gap:8px;flex:1;min-width:min(100%,320px);max-width:520px}
+.news input{flex:1;min-width:0;height:52px;border-radius:999px;border:2px solid var(--navy);background:var(--paper);padding:0 20px;font:500 15px var(--font);color:var(--navy)}
+.news .btn{padding-block:0;height:52px;background:var(--navy);color:var(--arena)}
+.news .btn:hover{background:var(--coral);color:var(--navy)}
+.msg{font-weight:700;font-size:13px;width:100%}
+
+/* footer */
+footer{background:var(--navy);color:var(--arena);padding-block:56px 28px}
+.fgrid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:36px}
+footer img{width:140px;height:auto;display:block}
+footer p.t{margin:16px 0 0;max-width:30ch;font-weight:500;font-size:14px;opacity:.9}
+footer h4{margin:0 0 14px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--sol);font-weight:700}
+footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:14px;font-weight:500}
+footer a:hover{color:var(--sol)}
+.fbase{margin-top:44px;padding-top:20px;border-top:1px solid rgba(243,230,207,.25);display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;font-size:12.5px;font-weight:500}
+.fbase b{color:var(--sol);font-weight:800}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,40px);background:var(--navy);color:var(--arena);border:2px solid var(--sol);border-radius:999px;padding:12px 22px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:1000px){
+  .plans{grid-template-columns:repeat(3,1fr)}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .vals{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .hero .wrap,.camp .wrap{grid-template-columns:1fr}
+  .visual{max-width:420px;margin-inline:auto;width:100%}
+  .search{order:3;flex-basis:100%;max-width:none}
+  .bar{flex-wrap:wrap;gap:12px}
+  .tools{margin-left:auto}
+  .logo img{height:44px}
+  nav.main li:last-child{margin-left:0}
+}
+@media(max-width:560px){
+  .plans{grid-template-columns:1fr 1fr}
+  .plan:last-child{grid-column:1/-1}
+  .grid{gap:24px 12px}
+  .row{flex-wrap:wrap}
+  .add{padding:8px 12px}
+  .fgrid{grid-template-columns:1fr}
+}
+
+@media(max-width:1000px){.ali .steps{grid-template-columns:1fr}.slots{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.slide .wrap{grid-template-columns:1fr}.pf{max-width:300px}.slide{min-height:0}.car-ui{bottom:16px}.gen li:last-child{display:none}.s-video .wrap{padding-bottom:84px}}
+
+/* ===== motion ===== */
+:root{--ease:cubic-bezier(.2,.7,.2,1);--spring:cubic-bezier(.34,1.56,.64,1)}
+html{scroll-behavior:smooth}
+header{transition:box-shadow .3s var(--ease)}
+.logo img{transition:height .3s var(--ease)}
+header.stuck{box-shadow:0 8px 24px rgba(14,32,62,.14)}
+header.stuck .logo img{height:40px}
+.js header{animation:hdr .7s var(--ease) both}
+@keyframes hdr{from{transform:translateY(-100%)}to{transform:none}}
+/* carrusel */
+.js .slide .wrap>div:first-child>*{opacity:0;transform:translateY(22px)}
+.js .slide.on .wrap>div:first-child>*{animation:up .8s var(--ease) both;animation-delay:calc(var(--k,0)*110ms + 150ms)}
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.js .pf .ph{clip-path:circle(0% at 50% 60%);transform:scale(.94)}
+.js .slide.on .pf .ph{animation:reveal 1s var(--ease) .15s both}
+@keyframes reveal{to{clip-path:circle(150% at 50% 60%);transform:none}}
+.js .pf .price-arc{opacity:0}
+.js .slide.on .pf .price-arc{animation:pop .7s var(--spring) .75s both}
+@keyframes pop{from{opacity:0;transform:rotate(-30deg) scale(.3)}to{opacity:1;transform:rotate(-8deg) scale(1)}}
+.js .slide.on .mark{animation:tag .6s var(--spring) .5s both}
+@keyframes tag{from{opacity:0;transform:rotate(-14deg) translateY(-10px)}to{opacity:1;transform:rotate(-4deg)}}
+.s-video video,.s-video .poster{transform:scale(1.02)}
+.slide.on.s-video video,.slide.on.s-video .poster{animation:kb 12s ease-out both}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+.slide.on .pf .ph img{animation:kb2 9s ease-out both}
+@keyframes kb2{from{transform:scale(1.06)}to{transform:scale(1)}}
+.btn{position:relative}
+.btn svg,.btn .ar{display:inline-block;transition:transform .25s var(--ease)}
+.btn:hover .ar{transform:translateX(4px)}
+.btn:active{transform:translate(2px,2px)!important;box-shadow:1px 1px 0 var(--navy)!important}
+.cbtn button{transition:transform .2s var(--spring),background .2s}
+.cbtn button:hover{transform:scale(1.1)}
+.cbtn button:active{transform:scale(.92)}
+/* barra de anuncio: marquee en movil */
+@media(max-width:760px){.promo .wrap{flex-wrap:nowrap;justify-content:flex-start;overflow:hidden}.promo .wrap span{white-space:nowrap;animation:mq 16s linear infinite;padding-right:28px}}
+@keyframes mq{to{transform:translateX(-100%)}}
+/* reveal al hacer scroll */
+.js .rv{opacity:0;transform:translateY(26px)}
+.js .rv.in{opacity:1;transform:none;transition:opacity .7s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0)*70ms)}
+.js .head .eyebrow::before{transform:scaleX(0);transform-origin:left}
+.js .head.in .eyebrow::before{transform:scaleX(1);transition:transform .7s var(--ease) .2s}
+/* planes */
+.plan{transition:transform .3s var(--spring),box-shadow .3s}
+.plan:hover{transform:translateY(-8px) rotate(-1deg);box-shadow:6px 6px 0 var(--navy)}
+.plan svg{transition:transform .5s var(--spring)}
+.plan:hover svg{transform:rotate(-12deg) scale(1.15)}
+.plan .go{transition:letter-spacing .3s var(--ease)}
+.plan:hover .go{letter-spacing:.16em}
+/* productos */
+.card{transition:opacity .35s,transform .35s var(--ease)}
+.card.pop{animation:cardin .5s var(--ease) both;animation-delay:calc(var(--i,0)*50ms)}
+@keyframes cardin{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.thumb img,.thumb svg.g{transition:transform .6s var(--ease)}
+.card:hover .thumb img{transform:scale(1.07)}
+.card:hover .thumb svg.g{transform:scale(1.08) rotate(-3deg)}
+.thumb{transition:box-shadow .3s}
+.card:hover .thumb{box-shadow:5px 5px 0 var(--navy)}
+.fav{transition:transform .25s var(--spring),background .2s}
+.fav:hover{transform:scale(1.12)}
+.fav.beat{animation:beat .5s var(--spring)}
+@keyframes beat{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+.add{transition:transform .2s var(--spring),background .2s}
+.add:hover{transform:translateY(-2px)}
+.add:active{transform:scale(.94)}
+.add.done{animation:flip .45s var(--ease)}
+@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+.badge.bump{animation:bump .5s var(--spring)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.6)}100%{transform:scale(1)}}
+.ico{transition:transform .2s var(--spring),background .2s}
+.ico:hover{transform:translateY(-2px) scale(1.05)}
+.tab{transition:background .2s,color .2s,transform .2s var(--spring)}
+.tab:hover{transform:translateY(-2px)}
+.gen button,nav.main button,nav.main a{transition:color .2s,border-color .2s}
+.fly{position:fixed;z-index:60;width:16px;height:16px;border-radius:50%;background:var(--coral);border:2px solid var(--navy);pointer-events:none}
+/* campaña y alianzas */
+.camp .arch{transition:transform .6s var(--ease)}
+.camp .arch:hover{transform:rotate(1.2deg) scale(1.02)}
+.price-arc{animation:wob 5s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(-3deg)}}
+.js .slide.on .pf .price-arc{animation:pop .7s var(--spring) .75s both,wob 5s ease-in-out 1.5s infinite}
+.step{transition:transform .3s var(--spring),box-shadow .3s}
+.step:hover{transform:translateY(-6px);box-shadow:5px 5px 0 var(--navy)}
+.slot{transition:transform .3s var(--spring),background .3s}
+.slot:hover{transform:translateY(-4px) rotate(-1deg);background:var(--sol)}
+.slot.ex:hover{background:var(--aqua)}
+footer a{transition:color .2s,padding-left .2s}
+footer li a:hover{padding-left:6px}
+.nombre span{transition:transform .25s var(--spring)}
+.nombre span:hover{transform:translateY(-3px) rotate(-2deg)}
+.toast{transition:opacity .3s,transform .45s var(--spring)}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .rv,.js .slide .wrap>div:first-child>*,.js .pf .price-arc,.js .pf .ph{opacity:1!important;transform:none!important;clip-path:none!important}
+  html{scroll-behavior:auto}
+}
+
+</style>
+
+<script>document.documentElement.classList.add("js")</script>
+<div class="promo"><div class="wrap"><span>Envío gratis en compras desde <b>$60</b></span><span>Retiro en tienda · <b>Plaza Merliot</b></span><span>Paga en cuotas sin recargo</span></div></div>
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <a class="logo" href="#" aria-label="Dushi Vacation Store, inicio"><img src="assets/logo-horizontal.png" alt="Dushi · Vacation Store"></a>
+      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input id="q" type="search" placeholder="Busca traje de baño, chumpa, mochila…" aria-label="Buscar productos"></label>
+      <div class="tools">
+        <button class="ico" aria-label="Mi cuenta"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-6 8-6s7 1.5 8 6"/></svg></button>
+        <button class="ico" aria-label="Carrito"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="badge" id="count">0</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="gen"><div class="wrap"><ul id="gen" aria-label="Comprar por género">
+    <li><button data-g="all" aria-pressed="true">Todo</button></li><li><button data-g="mujer" aria-pressed="false">Mujer</button></li><li><button data-g="hombre" aria-pressed="false">Hombre</button></li><li><button data-g="ninos" aria-pressed="false">Niños</button></li>
+    <li>Accesorios y artículos para todos</li>
+  </ul></div></div>
+  <nav class="main" aria-label="Categorías por plan"><div class="wrap"><ul id="plansnav">
+    <li><button data-p="playa" aria-pressed="false">Playa</button></li><li><button data-p="montana" aria-pressed="false">Montaña</button></li><li><button data-p="viaje" aria-pressed="false">Viaje</button></li><li><button data-p="casa" aria-pressed="false">En casa</button></li><li><button data-p="feriado" aria-pressed="false">Feriado largo</button></li><li><button data-p="acc" aria-pressed="false">Accesorios</button></li><li><button data-p="nuevo" aria-pressed="false">Novedades</button></li><li><a href="#alianzas">Alianzas</a></li>
+  </ul></div></nav>
+</header>
+
+<main>
+<div class="hero" aria-roledescription="carrusel" aria-label="Promociones">
+<div class="car" id="car">
+  <div class="track" id="track">
+    <div class="slide s-video" aria-roledescription="diapositiva" aria-label="1 de 4">
+      <img class="poster" src="assets/dushi-poster.jpg" alt="" aria-hidden="true">
+      <video id="vid" muted loop playsinline preload="auto" poster="assets/dushi-poster.jpg" aria-hidden="true"><source src="assets/dushi-hero.mp4" type="video/mp4"></video>
+      <div class="wrap"><div>
+        <div class="eyebrow">Vacation Store</div>
+        <h1>Tu próxima vacación <em>empieza aquí.</em></h1>
+        <p>Playa, montaña y viaje en una sola tienda. Marcas que quizá todavía no conoces, con una calidad que se nota.</p>
+        <div class="cta"><a class="btn pri" href="#productos" data-go="playa">Vístete de playa →</a><a class="btn sec" href="#planes">Ver los cinco planes</a></div>
+      </div></div>
+    </div>
+    <div class="slide s-coral" aria-roledescription="diapositiva" aria-label="2 de 4">
+      <div class="wrap"><div>
+        <div class="eyebrow">Feriado largo</div>
+        <h2>Te armamos el outfit de playa.</h2>
+        <p>Traje de baño, lentes y gorra. Un outfit para cada día del feriado.</p>
+        <div class="cta"><a class="btn pri" href="#productos" data-go="feriado">Ver el outfit →</a></div>
+      </div>
+      <div class="pf"><span class="mark">Promo de ejemplo</span><div class="ph"><img src="assets/playa-amigos.jpg" alt="Amigos armando su día de playa al atardecer" style="object-position:40% 50%"></div>
+        <div class="price-arc"><small>Desde</small><b>$19</b><span>gorra Dushi</span></div></div></div>
+    </div>
+    <div class="slide s-aqua" aria-roledescription="diapositiva" aria-label="3 de 4">
+      <div class="wrap"><div>
+        <div class="eyebrow">Montaña</div>
+        <h2>¿Volcán de madrugada? Llévate la chumpa y la gorra.</h2>
+        <p>Ropa outdoor para el frío de la mañana. We got your back.</p>
+        <div class="cta"><a class="btn pri" href="#productos" data-go="montana">Vístete de montaña →</a></div>
+      </div>
+      <div class="pf"><span class="mark">Promo de ejemplo</span><div class="ph"><img src="assets/camiseta-volcan.jpg" alt="Camiseta coral con el emblema Dushi frente a un volcán verde" style="object-position:50% 30%"></div>
+        <div class="price-arc"><small>−17%</small><b>$68</b><span>chumpa</span></div></div></div>
+    </div>
+    <div class="slide s-sol" aria-roledescription="diapositiva" aria-label="4 de 4">
+      <div class="wrap"><div>
+        <div class="eyebrow">Planes en casa y playa</div>
+        <h2>La hielera que llega primero a la playa.</h2>
+        <p>Hielera portátil 45 L con el sticker del emblema. Para piscina, playa o reunión con amigos.</p>
+        <div class="cta"><a class="btn pri" href="#productos" data-go="playa">Comprar ahora →</a></div>
+      </div>
+      <div class="pf"><span class="mark">Promo de ejemplo</span><div class="ph"><img src="assets/hielera-playa.jpg" alt="Hielera aqua con el emblema Dushi sobre la arena" style="object-position:50% 60%"></div>
+        <div class="price-arc"><small>Hielera</small><b>$89</b><span>45 L</span></div></div></div>
+    </div>
+  </div>
+  <div class="car-ui"><div class="wrap">
+    <div class="dots" id="dots" role="group" aria-label="Elegir diapositiva"></div>
+    <div class="cbtn">
+      <button class="pp" id="pp" aria-label="Pausar carrusel"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+      <button id="prev" aria-label="Anterior"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></button>
+      <button id="next" aria-label="Siguiente"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+    </div>
+  </div></div>
+</div>
+</div>
+<svg class="waves" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true"><rect width="1200" height="46" fill="#1A9E9C"/><path d="M0 12 Q25 0 50 12 T100 12 T150 12 T200 12 T250 12 T300 12 T350 12 T400 12 T450 12 T500 12 T550 12 T600 12 T650 12 T700 12 T750 12 T800 12 T850 12 T900 12 T950 12 T1000 12 T1050 12 T1100 12 T1150 12 T1200 12" fill="none" stroke="#fff" stroke-width="4"/><path d="M0 30 Q25 18 50 30 T100 30 T150 30 T200 30 T250 30 T300 30 T350 30 T400 30 T450 30 T500 30 T550 30 T600 30 T650 30 T700 30 T750 30 T800 30 T850 30 T900 30 T950 30 T1000 30 T1050 30 T1100 30 T1150 30 T1200 30" fill="none" stroke="#0E203E" stroke-width="4"/></svg>
+
+<section id="planes"><div class="wrap">
+  <div class="head"><div><div class="eyebrow">Planes y destinos</div><h2>Un día, un feriado o un vuelo.<br>Cinco planes, una tienda.</h2></div></div>
+  <div class="plans">
+    <a class="plan p1" href="#productos"><svg viewBox="0 0 52 52"><path d="M8 24a18 14 0 0 1 36 0Z" fill="#F96C4F" stroke="#0E203E" stroke-width="2.5" stroke-linejoin="round"/><path d="M26 24v20" stroke="#0E203E" stroke-width="3" stroke-linecap="round"/></svg><div><h3>Playa</h3><small>Pacífico, arena y atardecer.</small></div><span class="go">Traje de baño · lentes · gorra →</span></a>
+    <a class="plan p2" href="#productos"><svg viewBox="0 0 52 52"><path d="M4 44 22 14l9 14 6-8 11 24Z" fill="#1A9E9C" stroke="#0E203E" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="12" r="5" fill="#FCA62A" stroke="#0E203E" stroke-width="2"/></svg><div><h3>Montaña</h3><small>Volcán, bosque o cabaña.</small></div><span class="go">Ropa outdoor · chumpa →</span></a>
+    <a class="plan p3" href="#productos"><svg viewBox="0 0 52 52"><rect x="7" y="10" width="38" height="34" rx="6" fill="#fff" stroke="#0E203E" stroke-width="2.5"/><path d="M7 21h38M16 6v8M36 6v8" stroke="#0E203E" stroke-width="2.5" stroke-linecap="round"/><circle cx="26" cy="33" r="4.5" fill="#F96C4F"/></svg><div><h3>Feriado largo</h3><small>Semana Santa, agosto o diciembre.</small></div><span class="go">Un outfit para cada día →</span></a>
+    <a class="plan p4" href="#productos"><svg viewBox="0 0 52 52"><path d="M16 8v22M30 8v22M16 15h14M16 23h14" fill="none" stroke="#0E203E" stroke-width="2.8" stroke-linecap="round"/><path d="M4 38q5-5 10 0t10 0 10 0 10 0" fill="none" stroke="#1A9E9C" stroke-width="3" stroke-linecap="round"/><path d="M4 46q5-5 10 0t10 0 10 0 10 0" fill="none" stroke="#1A9E9C" stroke-width="3" stroke-linecap="round"/></svg><div><h3>En casa</h3><small>Piscina o reunión con amigos.</small></div><span class="go">Outfit de noche →</span></a>
+    <a class="plan p5" href="#productos"><svg viewBox="0 0 52 52"><path d="M4 30 46 12l2 4-14 12 6 14-4 2-10-12-14 6Z" fill="#fff" stroke="#0E203E" stroke-width="2.5" stroke-linejoin="round" transform="rotate(8 26 26) scale(.95) translate(1 3)"/></svg><div><h3>Viaje</h3><small>Un vuelo fuera del país.</small></div><span class="go">Artículos de viaje · mochila →</span></a>
+  </div>
+</div></section>
+
+<section class="prods" id="productos"><div class="wrap">
+  <div class="head"><div><div class="eyebrow">Productos y marcas</div><h2>Lo que llevamos para tu próximo plan</h2></div>
+    <div class="tabs" role="group" aria-label="Filtrar por plan">
+      <button class="tab" data-p="all" aria-pressed="true">Todo</button><button class="tab" data-p="playa" aria-pressed="false">Playa</button><button class="tab" data-p="montana" aria-pressed="false">Montaña</button><button class="tab" data-p="viaje" aria-pressed="false">Viaje</button>
+    </div></div>
+  <div class="toolbar"><div class="chipsrow" id="gchips" role="group" aria-label="Filtrar por género"><span class="lbl">Para</span>
+      <button class="tab" data-g="all" aria-pressed="true">Todos</button><button class="tab" data-g="mujer" aria-pressed="false">Mujer</button><button class="tab" data-g="hombre" aria-pressed="false">Hombre</button><button class="tab" data-g="ninos" aria-pressed="false">Niños</button></div>
+    <div class="chipsrow"><span class="count" id="cnt" role="status"></span>
+      <label><span class="lbl">Ordenar</span><select id="sort" aria-label="Ordenar productos"><option value="rel">Destacados</option><option value="asc">Precio: menor a mayor</option><option value="desc">Precio: mayor a menor</option></select></label></div></div>
+  <div class="grid" id="grid">
+    <article class="card" data-c="playa montana nuevo casa" data-g="hombre mujer ninos" data-pr="24.00"><div class="thumb" style="background:#F96C4F"><img src="assets/camiseta-volcan.jpg" alt="Camiseta de algodón, coral" loading="lazy"><span class="tag sol">Nuevo</span><button class="fav" aria-pressed="false" aria-label="Guardar Camiseta de algodón, coral"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Dushi</span><h3>Camiseta de algodón, coral</h3><div class="row"><span class="price">$24.00</span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="playa feriado" data-g="mujer" data-pr="46.00"><div class="thumb" style="background:#F3E6CF"><svg class="g" viewBox="0 0 120 100"><path d="M30 8c0 20-4 32-14 40 10 14 24 22 44 22s34-8 44-22c-10-8-14-20-14-40" fill="none" stroke="#0E203E" stroke-width="5" stroke-linecap="round"/><path d="M16 48c10 14 24 22 44 22s34-8 44-22c-4 28-20 42-44 42S20 76 16 48Z" fill="#F96C4F" stroke="#0E203E" stroke-width="4" stroke-linejoin="round"/><path d="M34 70q6-5 13 0t13 0 13 0 13 0" fill="none" stroke="#F3E6CF" stroke-width="3.5" stroke-linecap="round"/></svg><span class="tag sol">−20%</span><button class="fav" aria-pressed="false" aria-label="Guardar Traje de baño entero, coral"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Pacific Tide</span><h3>Traje de baño entero, coral</h3><div class="row"><span class="price">$46.00<s>$58.00</s></span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="playa viaje casa feriado acc" data-g="all" data-pr="89.00"><div class="thumb" style="background:#1A9E9C"><img src="assets/hielera-playa.jpg" alt="Hielera portátil 45 L, aqua" loading="lazy"><span class="tag ">Sticker del emblema</span><button class="fav" aria-pressed="false" aria-label="Guardar Hielera portátil 45 L, aqua"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Dushi</span><h3>Hielera portátil 45 L, aqua</h3><div class="row"><span class="price">$89.00</span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="playa acc feriado" data-g="all" data-pr="32.00"><div class="thumb" style="background:#FCA62A"><svg class="g" viewBox="0 0 120 60"><path d="M6 14h108" stroke="#0E203E" stroke-width="5" stroke-linecap="round"/><path d="M12 16h40v14c0 12-8 18-20 18S12 42 12 30Z M68 16h40v14c0 12-8 18-20 18S68 42 68 30Z" fill="#0E203E"/><path d="M52 24q8-6 16 0" fill="none" stroke="#0E203E" stroke-width="5"/></svg><button class="fav" aria-pressed="false" aria-label="Guardar Lentes de sol polarizados"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Solé Optics</span><h3>Lentes de sol polarizados</h3><div class="row"><span class="price">$32.00</span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="playa montana acc feriado" data-g="all" data-pr="19.00"><div class="thumb" style="background:#F3E6CF"><svg class="g" viewBox="0 0 120 80"><path d="M16 56C14 26 34 10 62 10s46 16 44 46Z" fill="#0E203E"/><path d="M62 56h50c2 0 6 6 4 10-2 3-8 4-20 4H40Z" fill="#0E203E" opacity=".85"/><circle cx="62" cy="36" r="13" fill="#1A9E9C" stroke="#F3E6CF" stroke-width="3"/><circle cx="62" cy="31" r="5" fill="#FCA62A"/><path d="M52 40l7-9 4 5 4-4 6 8Z" fill="#F96C4F"/></svg><span class="tag ">Más vendido</span><button class="fav" aria-pressed="false" aria-label="Guardar Gorra navy con parche bordado"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Dushi</span><h3>Gorra navy con parche bordado</h3><div class="row"><span class="price">$19.00</span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="montana " data-g="hombre mujer" data-pr="68.00"><div class="thumb" style="background:#F3E6CF"><svg class="g" viewBox="0 0 120 120"><path d="M42 14 18 28 6 70l16 4 6-18v52h64V56l6 18 16-4-12-42-24-14c-2 10-10 16-18 16s-16-6-18-16Z" fill="#1A9E9C" stroke="#0E203E" stroke-width="4" stroke-linejoin="round"/><path d="M60 30v76" stroke="#0E203E" stroke-width="4"/><path d="M28 80h20M72 80h20" stroke="#0E203E" stroke-width="4" stroke-linecap="round"/></svg><span class="tag sol">−17%</span><button class="fav" aria-pressed="false" aria-label="Guardar Chumpa ligera cortaviento"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Altura Co.</span><h3>Chumpa ligera cortaviento</h3><div class="row"><span class="price">$68.00<s>$82.00</s></span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="viaje montana acc" data-g="all" data-pr="54.00"><div class="thumb" style="background:#F3E6CF"><svg class="g" viewBox="0 0 100 120"><path d="M34 22c0-14 32-14 32 0" fill="none" stroke="#0E203E" stroke-width="6" stroke-linecap="round"/><rect x="14" y="20" width="72" height="92" rx="26" fill="#FCA62A" stroke="#0E203E" stroke-width="4"/><rect x="28" y="64" width="44" height="34" rx="10" fill="#F3E6CF" stroke="#0E203E" stroke-width="4"/><path d="M28 78h44" stroke="#0E203E" stroke-width="4"/><path d="M36 38h28" stroke="#0E203E" stroke-width="5" stroke-linecap="round"/></svg><button class="fav" aria-pressed="false" aria-label="Guardar Mochila de viaje 30 L"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Rumbo</span><h3>Mochila de viaje 30 L</h3><div class="row"><span class="price">$54.00</span><button class="add">Agregar</button></div></div></article>
+<article class="card" data-c="viaje nuevo" data-g="all" data-pr="112.00"><div class="thumb" style="background:#1A9E9C"><svg class="g" viewBox="0 0 100 120"><path d="M36 22v-8h28v8" fill="none" stroke="#0E203E" stroke-width="5"/><rect x="12" y="22" width="76" height="82" rx="14" fill="#F96C4F" stroke="#0E203E" stroke-width="4"/><path d="M34 32v62M66 32v62" stroke="#0E203E" stroke-width="4"/><circle cx="30" cy="110" r="4" fill="#0E203E"/><circle cx="70" cy="110" r="4" fill="#0E203E"/></svg><span class="tag sol">Nuevo</span><button class="fav" aria-pressed="false" aria-label="Guardar Maleta de mano rígida"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11Z"/></svg></button></div><div class="meta"><span class="brand">Rumbo</span><h3>Maleta de mano rígida</h3><div class="row"><span class="price">$112.00</span><button class="add">Agregar</button></div></div></article>
+  </div>
+</div></section>
+
+<section class="camp" id="campana"><div class="wrap">
+  <div>
+    <div class="eyebrow">Promos</div>
+    <h2>Tu próxima vacación <em>empieza aquí.</em></h2>
+    <p>Reserva con nuestros hoteles aliados y llévate el kit Dushi de regalo: toalla, gorra y bolsa de playa. Cupos limitados por fecha.</p>
+    <div class="cta"><a class="btn pri" href="#">Ver el plan →</a></div>
+  </div>
+  <div class="arch"><img src="assets/lago-kayak.jpg" alt="Vista aérea de un lago turquesa rodeado de bosque con dos kayaks"><div class="price-arc"><small>Kit desde</small><b>$39</b><span>con hotel aliado</span></div></div>
+</div></section>
+
+<section class="ali" id="alianzas"><div class="wrap">
+  <div class="head"><div><div class="eyebrow">Brands y alianzas</div><h2>Tu marca, tu hotel o tu destino, junto a Dushi.</h2></div></div>
+  <div class="steps">
+    <div class="step"><b class="n">1</b><h3>Tu logo en Dushi</h3><p>Hoteles, restaurantes y operadores aparecen en la tienda, en línea y en Plaza Merliot.</p></div>
+    <div class="step"><b class="n">2</b><h3>Descuentos cruzados</h3><p>Tus clientes reciben un beneficio con nosotros y los nuestros lo reciben contigo.</p></div>
+    <div class="step"><b class="n">3</b><h3>Una vacación completa</h3><p>Reservas el plan y llegas con todo listo: el hotel y el outfit en un solo lugar.</p></div>
+  </div>
+  <div class="slots" aria-label="Espacios para aliados">
+    <div class="slot ex">Hotel de playa<small>Ejemplo: Pelícanos · logo aquí</small></div>
+    <div class="slot">Tu logo aquí<small>Hotel de montaña</small></div>
+    <div class="slot">Tu logo aquí<small>Operador de tours</small></div>
+    <div class="slot">Tu logo aquí<small>Marca aliada</small></div>
+  </div>
+  <div class="cta"><a class="btn pri" href="#">Quiero ser aliado →</a></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div><img src="assets/logo-vertical-negativo.png" alt="Dushi · Vacation Store">
+      <p class="t">Una familia detrás de cada viaje. Tienda física y en línea con ropa y accesorios para tu playa, tu montaña y tus viajes.</p></div>
+    <div><h4>Comprar</h4><ul><li><a href="#productos">Playa</a></li><li><a href="#productos">Montaña</a></li><li><a href="#productos">Viaje</a></li><li><a href="#productos">Novedades</a></li><li><a href="#alianzas">Alianzas</a></li></ul></div>
+    <div><h4>Nosotros</h4><ul><li><a href="#nosotros">Nuestra historia</a></li><li><a href="#">Entregas · muy pronto</a></li><li><a href="#">Cambios y devoluciones</a></li><li><a href="#">Preguntas frecuentes</a></li></ul></div>
+    <div><h4>Visítanos</h4><ul><li>Plaza Merliot</li><li>Antiguo Cuscatlán, El Salvador</li><li>Lun a dom · 10 a.m. a 8 p.m.</li><li><a href="#">Instagram · Facebook · TikTok</a></li></ul></div>
+  </div>
+  <div class="fgrid" id="nosotros" style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(243,230,207,.25);grid-template-columns:1fr">
+    <div><h4>Nuestra historia</h4>
+      <p class="t" style="max-width:62ch">Dushi viene del papiamento, hablado en Aruba, Bonaire y Curazao, y significa dulce, cariño, agradable. Es un proyecto familiar: dos papás y tres hijos que quieren que cada salida, feriado o vuelo empiece con todo resuelto.</p>
+      <div class="nombre"><span><b>chévere</b> en Colombia</span><span><b>chido</b> en México</span><span><b>pura vida</b> en Costa Rica</span><span class="sv"><b>chivo</b> en El Salvador</span></div></div>
+  </div>
+  <div class="fbase"><span><b>Ponte en modo vacación.</b></span><span>© 2026 Dushi Vacation Store · Mockup, precios y datos de ejemplo</span></div>
+</div></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var count=0,cEl=document.getElementById('count'),toast=document.getElementById('toast'),tt;
+  function bump(){var bd=document.querySelector('.badge');bd.classList.remove('bump');void bd.offsetWidth;bd.classList.add('bump')}
+  function fly(b){
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches||!b.animate)return;
+    var cart=document.querySelector('.badge').getBoundingClientRect(),r=b.getBoundingClientRect(),d=document.createElement('div');
+    d.className='fly';document.body.appendChild(d);
+    var x0=r.left+r.width/2,y0=r.top+r.height/2,x1=cart.left+cart.width/2,y1=cart.top+cart.height/2;
+    var a=d.animate([{transform:'translate('+x0+'px,'+y0+'px) scale(1)',opacity:1},{transform:'translate('+(x0+(x1-x0)*.5)+'px,'+(Math.min(y0,y1)-60)+'px) scale(1.2)',opacity:1,offset:.5},{transform:'translate('+x1+'px,'+y1+'px) scale(.3)',opacity:.4}],{duration:700,easing:'cubic-bezier(.4,0,.2,1)'});
+    a.onfinish=function(){d.remove()};
+  }
+  function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show')},2200)}
+  document.querySelectorAll('.add').forEach(function(b){b.addEventListener('click',function(){
+    count++;cEl.textContent=count;b.classList.add('done');bump();fly(b);b.textContent='Agregado ✓';
+    say('Agregaste '+b.closest('.card').querySelector('h3').textContent+' al carrito');
+    setTimeout(function(){b.classList.remove('done');b.textContent='Agregar'},1600)})});
+  document.querySelectorAll('.fav').forEach(function(b){b.addEventListener('click',function(){
+    var on=b.getAttribute('aria-pressed')==='true';b.setAttribute('aria-pressed',String(!on));b.classList.remove('beat');void b.offsetWidth;if(!on)b.classList.add('beat')})});
+
+  /* filtros: género x plan x búsqueda x orden */
+  var grid=document.getElementById('grid'),cards=[].slice.call(grid.querySelectorAll('.card')),
+      st={g:'all',p:'all',q:'',s:'rel'},cnt=document.getElementById('cnt');
+  var orderIdx=cards.map(function(c,i){c.dataset.i=i;return c});
+  function pressed(sel,attr,val){document.querySelectorAll(sel).forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset[attr]===val))})}
+  function apply(){
+    var n=0;
+    cards.forEach(function(c){
+      var gs=c.dataset.g.split(' '),ps=c.dataset.c.split(' ');
+      var okG=st.g==='all'||gs.indexOf('all')>-1||gs.indexOf(st.g)>-1;
+      var okP=st.p==='all'||ps.indexOf(st.p)>-1;
+      var okQ=!st.q||c.textContent.toLowerCase().indexOf(st.q)>-1;
+      c.hidden=!(okG&&okP&&okQ);if(!c.hidden)n++;});
+    var sorted=cards.slice().sort(function(a,b){
+      if(st.s==='asc')return a.dataset.pr-b.dataset.pr;
+      if(st.s==='desc')return b.dataset.pr-a.dataset.pr;
+      return a.dataset.i-b.dataset.i});
+    sorted.forEach(function(c){grid.appendChild(c)});
+    cnt.textContent=n+(n===1?' producto':' productos');
+    if(window.__f){var k=0;cards.forEach(function(c){c.classList.remove('pop');if(!c.hidden){c.style.setProperty('--i',k++);void c.offsetWidth;c.classList.add('pop')}})}
+    var e=document.getElementById('emp');
+    if(!n&&!e){e=document.createElement('p');e.id='emp';e.className='empty';e.textContent='No encontramos nada con esos filtros. Prueba con otro plan o género.';grid.after(e)}
+    if(n&&e)e.remove();
+    pressed('#gen button','g',st.g);pressed('#gchips button','g',st.g);
+    pressed('#plansnav button','p',st.p);pressed('.tabs .tab','p',st.p);
+  }
+  document.querySelectorAll('[data-g]').forEach(function(b){b.addEventListener('click',function(){st.g=b.dataset.g;apply();if(b.closest('#gen'))document.getElementById('productos').scrollIntoView({behavior:'smooth'})})});
+  document.querySelectorAll('.tabs [data-p],#plansnav [data-p]').forEach(function(b){b.addEventListener('click',function(){
+    st.p=(st.p===b.dataset.p&&b.closest('#plansnav'))?'all':b.dataset.p;apply();
+    if(b.closest('#plansnav'))document.getElementById('productos').scrollIntoView({behavior:'smooth'})})});
+  document.querySelectorAll('[data-go]').forEach(function(a){a.addEventListener('click',function(){st.p=a.dataset.go;apply()})});
+  document.getElementById('q').addEventListener('input',function(e){st.q=e.target.value.trim().toLowerCase();apply()});
+  document.getElementById('sort').addEventListener('change',function(e){st.s=e.target.value;apply()});
+  apply();window.__f=true;
+
+  /* carrusel */
+  var track=document.getElementById('track'),slides=track.children,N=slides.length,i=0,timer,playing=true,
+      dots=document.getElementById('dots'),vid=document.getElementById('vid'),pp=document.getElementById('pp'),
+      reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches,DUR=[9,6,6,6];
+  for(var k=0;k<N;k++){(function(k){var d=document.createElement('button');d.className='dot';d.setAttribute('aria-label','Ir a la diapositiva '+(k+1));
+    d.addEventListener('click',function(){go(k)});dots.appendChild(d)})(k)}
+  function go(n){
+    i=(n+N)%N;track.style.transform='translateX('+(-100*i)+'%)';
+    [].forEach.call(dots.children,function(d,j){d.setAttribute('aria-current',String(j===i));d.style.setProperty('--dur',DUR[j]+'s');d.classList.remove('paused');void d.offsetWidth;d.classList.toggle('paused',!playing)});
+    [].forEach.call(slides,function(s,j){s.classList.toggle('on',j===i);s.setAttribute('aria-hidden',String(j!==i));[].forEach.call(s.querySelectorAll('a,button'),function(x){x.tabIndex=j===i?0:-1})});
+    if(vid){if(i===0&&playing&&!reduce){var p=vid.play();if(p&&p.catch)p.catch(function(){})}else vid.pause()}
+    clearTimeout(timer);if(playing&&!reduce)timer=setTimeout(function(){go(i+1)},DUR[i]*1000);
+  }
+  function setPlay(v){playing=v;pp.setAttribute('aria-label',v?'Pausar carrusel':'Reanudar carrusel');
+    pp.innerHTML=v?'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>';go(i)}
+  pp.addEventListener('click',function(){setPlay(!playing)});
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  var car=document.getElementById('car');
+  car.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')go(i-1);if(e.key==='ArrowRight')go(i+1)});
+  [].forEach.call(slides,function(s){[].forEach.call(s.querySelectorAll('.wrap>div:first-child>*'),function(el,k){el.style.setProperty('--k',k)})});
+  if(reduce){playing=false;setPlay(false)}else go(0);
+
+  /* header + reveal al hacer scroll */
+  var hdr=document.querySelector('header');
+  function onS(){hdr.classList.toggle('stuck',window.scrollY>40)}
+  window.addEventListener('scroll',onS,{passive:true});onS();
+  var groups=['.head','.toolbar','.plan','.step','.slot','.card','.camp .wrap>*','.ali .cta','footer .fgrid>div'];
+  var els=[];
+  groups.forEach(function(sel){var prev=null,idx=0;document.querySelectorAll(sel).forEach(function(el){
+    var par=el.parentNode;if(par!==prev){prev=par;idx=0}
+    el.classList.add('rv');el.style.setProperty('--i',Math.min(idx++,7));els.push(el)})});
+  if('IntersectionObserver' in window&&!reduce){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var el=e.target;el.classList.add('in');io.unobserve(el);if(!el.classList.contains('head'))el.addEventListener('transitionend',function h(ev){if(ev.propertyName==='transform'){el.classList.remove('rv','in');el.style.removeProperty('--i');el.removeEventListener('transitionend',h)}})}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    els.forEach(function(el){io.observe(el)});
+  }else els.forEach(function(el){el.classList.add('in')});
+})();
+</script>
+
+</body></html>
