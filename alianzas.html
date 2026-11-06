@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Alianzas · Dushi Vacation Store</title><meta name="description" content="Tu marca, tu hotel o tu destino, junto a Dushi. Conviértete en aliado y hagamos descuentos cruzados.">
+<link rel="icon" href="assets/emblema.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script>document.documentElement.classList.add("js")</script></head><body>
+<div class="promo"><div class="wrap"><span>Envío gratis en compras desde <b>$60</b></span><span>Retiro en tienda · <b>Plaza Merliot</b></span><span>Paga en cuotas sin recargo</span></div></div>
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <a class="logo" href="index.html" aria-label="Dushi Vacation Store, inicio"><img src="assets/logo-horizontal.png" alt="Dushi · Vacation Store"></a>
+      <form class="search" action="index.html" role="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input name="q" type="search" placeholder="Busca traje de baño, chumpa, mochila…" aria-label="Buscar productos"></form>
+      <div class="tools">
+        <a class="ico" href="index.html" aria-label="Volver a la tienda"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></a>
+      </div>
+    </div>
+  </div>
+  <div class="gen"><div class="wrap"><ul aria-label="Comprar por género">
+    <li><a href="index.html">Todo</a></li><li><a href="index.html?g=mujer">Mujer</a></li><li><a href="index.html?g=hombre">Hombre</a></li><li><a href="index.html?g=ninos">Niños</a></li>
+    <li>Accesorios y artículos para todos</li>
+  </ul></div></div>
+  <nav class="main" aria-label="Secciones"><div class="wrap"><ul>
+    <li><a href="index.html?p=playa">Playa</a></li><li><a href="index.html?p=montana">Montaña</a></li><li><a href="index.html?p=viaje">Viaje</a></li><li><a href="alianzas.html" aria-current="page">Alianzas</a></li><li><a href="historia.html">Nuestra historia</a></li><li><a href="faq.html">Preguntas</a></li>
+  </ul></div></nav>
+</header>
+
+<main>
+<section class="ali"><div class="wrap">
+  <div class="crumbs"><a href="index.html">Inicio</a> · Alianzas</div>
+  <div class="head"><div><div class="eyebrow">Brands y alianzas</div><h1 style="font-weight:800;font-size:clamp(28px,3.6vw,46px);margin-top:12px">Tu marca, tu hotel o tu destino, junto a Dushi.</h1></div></div>
+  <div class="steps">
+    <div class="step"><b class="n">1</b><h3>Tu logo en Dushi</h3><p>Hoteles, restaurantes y operadores aparecen en la tienda, en línea y en Plaza Merliot.</p></div>
+    <div class="step"><b class="n">2</b><h3>Descuentos cruzados</h3><p>Tus clientes reciben un beneficio con nosotros y los nuestros lo reciben contigo.</p></div>
+    <div class="step"><b class="n">3</b><h3>Una vacación completa</h3><p>Reservas el plan y llegas con todo listo: el hotel y el outfit en un solo lugar.</p></div>
+  </div>
+  <div class="slots" aria-label="Espacios para aliados">
+    <div class="slot ex">Hotel de playa<small>Ejemplo: Pelícanos · logo aquí</small></div>
+    <div class="slot">Tu logo aquí<small>Hotel de montaña</small></div>
+    <div class="slot">Tu logo aquí<small>Operador de tours</small></div>
+    <div class="slot">Tu logo aquí<small>Marca aliada</small></div>
+  </div>
+  <div class="cta"><button type="button" class="btn pri" id="openForm" aria-haspopup="dialog">Quiero ser aliado <span class="ar">→</span></button></div>
+</div></section>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlgT">
+  <button type="button" class="dlg-x" id="closeForm" aria-label="Cerrar formulario"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <form id="aliForm" novalidate>
+    <div class="eyebrow">Quiero ser aliado</div>
+    <h2 id="dlgT">Cuéntanos de tu negocio.</h2>
+    <p class="dlg-p">Déjanos tus datos y te contactamos para armar el plan juntos.</p>
+    <div class="f"><label for="f-nombre">Nombre del negocio</label><input id="f-nombre" name="negocio" type="text" autocomplete="organization" required><span class="err" data-for="f-nombre"></span></div>
+    <div class="f2">
+      <div class="f"><label for="f-pais">País</label><input id="f-pais" name="pais" type="text" list="paises" autocomplete="country-name" required><datalist id="paises"><option value="El Salvador"><option value="Guatemala"><option value="Honduras"><option value="Nicaragua"><option value="Costa Rica"><option value="Panamá"><option value="México"><option value="Colombia"><option value="Estados Unidos"><option value="Aruba"><option value="Curazao"><option value="Bonaire"><option value="República Dominicana"><option value="Perú"><option value="Chile"><option value="Argentina"><option value="España"></datalist><span class="err" data-for="f-pais"></span></div>
+      <div class="f"><label for="f-tipo">Tipo de negocio</label><select id="f-tipo" name="tipo" required><option value="">Elige uno</option><option>Hotel o alojamiento</option><option>Restaurante o bar</option><option>Operador de tours</option><option>Marca de ropa o accesorios</option><option>Otro</option></select><span class="err" data-for="f-tipo"></span></div>
+    </div>
+    <div class="f2">
+      <div class="f"><label for="f-tel">Teléfono de contacto</label><input id="f-tel" name="telefono" type="tel" inputmode="tel" autocomplete="tel" placeholder="+503 0000 0000" pattern="[0-9 +()\-]{7,20}" required><span class="err" data-for="f-tel"></span></div>
+      <div class="f"><label for="f-mail">Correo electrónico</label><input id="f-mail" name="correo" type="email" autocomplete="email" required><span class="err" data-for="f-mail"></span></div>
+    </div>
+    <button class="btn pri" type="submit">Enviar mis datos <span class="ar">→</span></button>
+  </form>
+  <div class="ok" id="ok" hidden role="status">
+    <div class="okic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5L20 6"/></svg></div>
+    <h2>¡Gracias! Ya casi estamos de viaje.</h2>
+    <p>Recibimos los datos de <b id="okName"></b>. Te escribimos pronto.</p>
+    <button type="button" class="btn sec" id="okClose">Cerrar</button>
+  </div>
+</dialog>
+</main>
+
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div><img src="assets/logo-vertical-negativo.png" alt="Dushi · Vacation Store">
+      <p class="t">Una familia detrás de cada viaje. Tienda física y en línea con ropa y accesorios para tu playa, tu montaña y tus viajes.</p></div>
+    <div><h4>Comprar</h4><ul><li><a href="index.html#productos">Playa</a></li><li><a href="index.html#productos">Montaña</a></li><li><a href="index.html#productos">Viaje</a></li><li><a href="index.html#productos">Novedades</a></li><li><a href="alianzas.html">Alianzas</a></li></ul></div>
+    <div><h4>Nosotros</h4><ul><li><a href="historia.html">Nuestra historia</a></li><li><a href="faq.html#entregas">Entregas · muy pronto</a></li><li><a href="faq.html#cambios">Cambios y devoluciones</a></li><li><a href="faq.html">Preguntas frecuentes</a></li></ul></div>
+    <div><h4>Visítanos</h4><ul><li>Plaza Merliot</li><li>Antiguo Cuscatlán, El Salvador</li><li>Lun a dom · 10 a.m. a 8 p.m.</li><li><a href="#">Instagram · Facebook · TikTok</a></li></ul></div>
+  </div>
+  <div class="fgrid" id="nosotros" style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(243,230,207,.25);grid-template-columns:1fr">
+    <div><h4>Nuestra historia</h4>
+      <p class="t" style="max-width:62ch">Dushi viene del papiamento, hablado en Aruba, Bonaire y Curazao, y significa dulce, cariño, agradable. Es un proyecto familiar: dos papás y tres hijos que quieren que cada salida, feriado o vuelo empiece con todo resuelto.</p>
+      <div class="nombre"><span><b>chévere</b> en Colombia</span><span><b>chido</b> en México</span><span><b>pura vida</b> en Costa Rica</span><span class="sv"><b>chivo</b> en El Salvador</span></div>
+      <p style="margin:16px 0 0"><a href="historia.html" style="font-weight:800;color:var(--sol);border-bottom:2px solid var(--sol)">Leer nuestra historia →</a></p></div>
+  </div>
+  <div class="fbase"><span><b>Ponte en modo vacación.</b></span><span>© 2026 Dushi Vacation Store · Mockup, precios y datos de ejemplo</span></div>
+</div></footer>
+<script src="assets/common.js" defer></script>
+<script src="assets/alianzas.js" defer></script>
+</body></html>

@@ -439,3 +439,32 @@ form.search{margin:0}
 .fq-cta h2{font-size:clamp(22px,2.6vw,30px);font-weight:800;max-width:24ch}
 @media(max-width:1000px){.emb .grid3{grid-template-columns:1fr}.emb .col.l{text-align:left}.col.l .callout .nn{margin-left:0}.emb .col{gap:22px}.emb .em-img{max-width:280px;margin-inline:auto;order:-1}.tzs .wrap{grid-template-columns:1fr}}
 @media(max-width:760px){.pg-hero .wrap{grid-template-columns:1fr}.gen li:last-child{display:none}}
+
+/* ===== formulario de aliados ===== */
+.dlg{border:3px solid var(--navy);border-radius:28px;padding:0;width:min(560px,calc(100% - 24px));max-height:calc(100dvh - 24px);background:var(--paper);color:var(--navy);font-family:var(--font);overflow:auto;box-shadow:8px 8px 0 var(--navy)}
+.dlg::backdrop{background:rgba(14,32,62,.62);backdrop-filter:blur(3px)}
+.dlg[open]{animation:dlgin .45s var(--spring)}
+.dlg[open]::backdrop{animation:fade .3s}
+@keyframes dlgin{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.dlg form,.dlg .ok{padding:30px clamp(20px,4vw,34px) 30px}
+.dlg h2{font-weight:800;font-size:clamp(24px,3vw,32px);margin:10px 0 8px}
+.dlg-p{margin:0 0 20px;font-weight:500;color:var(--muted)}
+.dlg-x{position:absolute;right:14px;top:14px;width:40px;height:40px;border-radius:50%;border:2px solid var(--navy);background:var(--paper);color:var(--navy);display:grid;place-items:center;transition:transform .25s var(--spring),background .2s}
+.dlg-x:hover{background:var(--sol);transform:rotate(90deg)}
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-width:0}
+.f label{font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase}
+.f input,.f select{font:500 16px var(--font);color:var(--navy);background:var(--arena);border:2px solid var(--navy);border-radius:14px;height:50px;padding:0 16px;width:100%;transition:box-shadow .2s,background .2s}
+.f input:focus,.f select:focus{outline:0;box-shadow:0 0 0 3px var(--sol);background:#fff}
+.f input[aria-invalid="true"],.f select[aria-invalid="true"]{border-color:var(--coral);background:#fff;animation:shake .35s}
+.f .err{min-height:0;font-size:13px;font-weight:700;color:#B3341C}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.dlg form .btn{width:100%;justify-content:center;margin-top:8px}
+.ok{text-align:center}
+.ok[hidden]{display:none}
+.okic{width:72px;height:72px;border-radius:50%;background:var(--aqua);border:3px solid var(--navy);display:grid;place-items:center;margin:6px auto 14px;animation:pop2 .6s var(--spring)}
+@keyframes pop2{from{transform:scale(0) rotate(-40deg)}to{transform:none}}
+.ok p{margin:0 0 20px;font-weight:500}
+@media(max-width:560px){.f2{grid-template-columns:1fr}}
+body:has(dialog[open]){overflow:hidden}

@@ -4,7 +4,7 @@
   var hdr=document.querySelector('header');
   function onS(){hdr.classList.toggle('stuck',window.scrollY>40)}
   window.addEventListener('scroll',onS,{passive:true});onS();
-  var groups=['.head','.toolbar','.plan','.step','.slot','.card','.camp .wrap>*','.ali .cta','footer .fgrid>div','.v3','.callout','.qa','.fq-cta','.draft','.tzs .wrap>*','.nm .wrap>*','.band .wrap>*'];
+  var groups=['.head','.toolbar','.plan','.step','.slot','.card','.camp .wrap>*','.ali .cta','footer .fgrid>div','.v3','.callout','.qa','.fq-cta','.draft','.tzs .wrap>*','.nm .wrap>*','.band .wrap>*','.ali .head'];
   var els=[];
   groups.forEach(function(sel){var prev=null,idx=0;document.querySelectorAll(sel).forEach(function(el){
     var par=el.parentNode;if(par!==prev){prev=par;idx=0}
