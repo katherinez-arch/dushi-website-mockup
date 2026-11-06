@@ -1,0 +1,196 @@
+[
+ {
+  "sku": "DSH-CAM-001",
+  "nombre": "Camiseta de algodón, coral",
+  "marca": "Dushi",
+  "categoria": "Camisetas",
+  "precio": 24.0,
+  "precioAnterior": null,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "DSH-CAM-001-S",
+    "talla": "S",
+    "color": "Coral",
+    "fisica": 6
+   },
+   {
+    "codigo": "DSH-CAM-001-M",
+    "talla": "M",
+    "color": "Coral",
+    "fisica": 9
+   },
+   {
+    "codigo": "DSH-CAM-001-L",
+    "talla": "L",
+    "color": "Coral",
+    "fisica": 8
+   },
+   {
+    "codigo": "DSH-CAM-001-XL",
+    "talla": "XL",
+    "color": "Coral",
+    "fisica": 4
+   }
+  ]
+ },
+ {
+  "sku": "PTD-TRJ-001",
+  "nombre": "Traje de baño entero, coral",
+  "marca": "Pacific Tide",
+  "categoria": "Trajes de baño",
+  "precio": 46.0,
+  "precioAnterior": 58.0,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "PTD-TRJ-001-S",
+    "talla": "S",
+    "color": "Coral",
+    "fisica": 5
+   },
+   {
+    "codigo": "PTD-TRJ-001-M",
+    "talla": "M",
+    "color": "Coral",
+    "fisica": 7
+   },
+   {
+    "codigo": "PTD-TRJ-001-L",
+    "talla": "L",
+    "color": "Coral",
+    "fisica": 3
+   }
+  ]
+ },
+ {
+  "sku": "DSH-HIE-045",
+  "nombre": "Hielera portátil 45 L, aqua",
+  "marca": "Dushi",
+  "categoria": "Artículos de playa",
+  "precio": 89.0,
+  "precioAnterior": null,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "DSH-HIE-045-ÚNICA",
+    "talla": "Única",
+    "color": "Aqua",
+    "fisica": 12
+   }
+  ]
+ },
+ {
+  "sku": "SOL-LEN-001",
+  "nombre": "Lentes de sol polarizados",
+  "marca": "Solé Optics",
+  "categoria": "Accesorios",
+  "precio": 32.0,
+  "precioAnterior": null,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "SOL-LEN-001-ÚNICA",
+    "talla": "Única",
+    "color": "Negro",
+    "fisica": 15
+   }
+  ]
+ },
+ {
+  "sku": "DSH-GOR-001",
+  "nombre": "Gorra navy con parche bordado",
+  "marca": "Dushi",
+  "categoria": "Accesorios",
+  "precio": 19.0,
+  "precioAnterior": null,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "DSH-GOR-001-ÚNICA",
+    "talla": "Única",
+    "color": "Navy",
+    "fisica": 20
+   }
+  ]
+ },
+ {
+  "sku": "ALT-CHU-001",
+  "nombre": "Chumpa ligera cortaviento",
+  "marca": "Altura Co.",
+  "categoria": "Ropa outdoor",
+  "precio": 68.0,
+  "precioAnterior": 82.0,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "ALT-CHU-001-S",
+    "talla": "S",
+    "color": "Verde",
+    "fisica": 4
+   },
+   {
+    "codigo": "ALT-CHU-001-M",
+    "talla": "M",
+    "color": "Verde",
+    "fisica": 6
+   },
+   {
+    "codigo": "ALT-CHU-001-L",
+    "talla": "L",
+    "color": "Verde",
+    "fisica": 5
+   }
+  ]
+ },
+ {
+  "sku": "RUM-MOC-030",
+  "nombre": "Mochila de viaje 30 L",
+  "marca": "Rumbo",
+  "categoria": "Artículos de viaje",
+  "precio": 54.0,
+  "precioAnterior": null,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "RUM-MOC-030-ÚNICA",
+    "talla": "Única",
+    "color": "Navy",
+    "fisica": 10
+   }
+  ]
+ },
+ {
+  "sku": "RUM-MAL-001",
+  "nombre": "Maleta de mano rígida",
+  "marca": "Rumbo",
+  "categoria": "Artículos de viaje",
+  "precio": 112.0,
+  "precioAnterior": null,
+  "iva": 0.13,
+  "stockSeguridad": 0,
+  "bodega": "WEB",
+  "variantes": [
+   {
+    "codigo": "RUM-MAL-001-ÚNICA",
+    "talla": "Única",
+    "color": "Coral",
+    "fisica": 3
+   }
+  ]
+ }
+]

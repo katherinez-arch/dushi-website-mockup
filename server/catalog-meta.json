@@ -1,0 +1,133 @@
+{
+ "DSH-CAM-001": {
+  "nombre": "Camiseta de algodón, coral",
+  "marca": "Dushi",
+  "planes": [
+   "playa",
+   "montana",
+   "nuevo",
+   "casa"
+  ],
+  "generos": [
+   "hombre",
+   "mujer",
+   "ninos"
+  ],
+  "bg": "#F96C4F",
+  "imagen": "assets/camiseta-volcan.jpg",
+  "etiqueta": "Nuevo",
+  "etiquetaSol": true
+ },
+ "PTD-TRJ-001": {
+  "nombre": "Traje de baño entero, coral",
+  "marca": "Pacific Tide",
+  "planes": [
+   "playa",
+   "feriado"
+  ],
+  "generos": [
+   "mujer"
+  ],
+  "bg": "#F3E6CF",
+  "imagen": null,
+  "etiqueta": null,
+  "etiquetaSol": true
+ },
+ "DSH-HIE-045": {
+  "nombre": "Hielera portátil 45 L, aqua",
+  "marca": "Dushi",
+  "planes": [
+   "playa",
+   "viaje",
+   "casa",
+   "feriado",
+   "acc"
+  ],
+  "generos": [
+   "all"
+  ],
+  "bg": "#1A9E9C",
+  "imagen": "assets/hielera-playa.jpg",
+  "etiqueta": "Sticker del emblema",
+  "etiquetaSol": false
+ },
+ "SOL-LEN-001": {
+  "nombre": "Lentes de sol polarizados",
+  "marca": "Solé Optics",
+  "planes": [
+   "playa",
+   "acc",
+   "feriado"
+  ],
+  "generos": [
+   "all"
+  ],
+  "bg": "#FCA62A",
+  "imagen": null,
+  "etiqueta": null,
+  "etiquetaSol": false
+ },
+ "DSH-GOR-001": {
+  "nombre": "Gorra navy con parche bordado",
+  "marca": "Dushi",
+  "planes": [
+   "playa",
+   "montana",
+   "acc",
+   "feriado"
+  ],
+  "generos": [
+   "all"
+  ],
+  "bg": "#F3E6CF",
+  "imagen": null,
+  "etiqueta": "Más vendido",
+  "etiquetaSol": false
+ },
+ "ALT-CHU-001": {
+  "nombre": "Chumpa ligera cortaviento",
+  "marca": "Altura Co.",
+  "planes": [
+   "montana"
+  ],
+  "generos": [
+   "hombre",
+   "mujer"
+  ],
+  "bg": "#F3E6CF",
+  "imagen": null,
+  "etiqueta": null,
+  "etiquetaSol": true
+ },
+ "RUM-MOC-030": {
+  "nombre": "Mochila de viaje 30 L",
+  "marca": "Rumbo",
+  "planes": [
+   "viaje",
+   "montana",
+   "acc"
+  ],
+  "generos": [
+   "all"
+  ],
+  "bg": "#F3E6CF",
+  "imagen": null,
+  "etiqueta": null,
+  "etiquetaSol": false
+ },
+ "RUM-MAL-001": {
+  "nombre": "Maleta de mano rígida",
+  "marca": "Rumbo",
+  "planes": [
+   "viaje",
+   "nuevo"
+  ],
+  "generos": [
+   "all"
+  ],
+  "bg": "#1A9E9C",
+  "imagen": null,
+  "etiqueta": "Nuevo",
+  "etiquetaSol": true
+ }
+}

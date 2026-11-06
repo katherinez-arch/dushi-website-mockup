@@ -1,0 +1,13 @@
+{
+  "name": "dushi-web-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Servidor de prueba de VELARIS + backend del sitio de Dushi (sin dependencias externas)",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "mock": "node velaris-mock.js",
+    "web": "node web-backend.js",
+    "dev": "node dev.js",
+    "test": "node test.js"
+  }
+}
