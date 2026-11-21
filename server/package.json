@@ -8,6 +8,7 @@
     "mock": "node velaris-mock.js",
     "web": "node web-backend.js",
     "dev": "node dev.js",
+    "dev:catalogo": "node dev.js catalogo",
     "test": "node test.js"
   }
 }

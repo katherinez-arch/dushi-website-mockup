@@ -5,6 +5,7 @@
  * - Guarda las credenciales de VELARIS (nunca llegan al navegador).
  * - Mantiene en caché el catálogo y las existencias para no pasar del límite de 120 solicitudes/min.
  * - Expone al sitio una API pequeña: /api/catalogo, /api/stock, /api/reservas, /api/pedidos.
+ * - Con la API real de VELARIS, /api/pedidos cobra y crea la factura electrónica (01) o el crédito fiscal (03).
  * - Sirve los archivos estáticos del sitio (index.html, assets/…).
  *
  * Variables de entorno: ver .env.example
@@ -49,7 +50,7 @@ async function obtenerToken(forzar = false) {
   token = j.accessToken || j.access_token; tokenExp = Date.now() + (j.expiresIn || j.expires_in) * 1000;
   return token;
 }
-async function velaris(metodo, ruta, { body, idem, query } = {}, reintento = true) {
+async function velaris(metodo, ruta, { body, idem, query, timeout = 8000 } = {}, reintento = true) {
   const url = new URL(VELARIS_URL + '/api/v1' + ruta);
   for (const [k, v] of Object.entries(query || {})) url.searchParams.set(k, v);
   const raw = body === undefined ? undefined : JSON.stringify(body);
@@ -58,12 +59,13 @@ async function velaris(metodo, ruta, { body, idem, query } = {}, reintento = tru
   if (idem) headers['Idempotency-Key'] = idem;
   if (SIGN && raw) headers['X-Signature'] = crypto.createHmac('sha256', CLIENT_SECRET).update(raw).digest('hex');
   let r;
-  try { r = await fetch(url, { method: metodo, headers, body: raw, signal: AbortSignal.timeout(8000) }); }
+  try { r = await fetch(url, { method: metodo, headers, body: raw, signal: AbortSignal.timeout(timeout) }); }
   catch (e) { throw Object.assign(new Error('VELARIS no responde'), { status: 503, causa: e }); }
-  if (r.status === 401 && reintento) { await obtenerToken(true); return velaris(metodo, ruta, { body, idem, query }, false); }
+  if (r.status === 401 && reintento) { await obtenerToken(true); return velaris(metodo, ruta, { body, idem, query, timeout }, false); }
   const txt = await r.text(); let j = null;
   try { j = txt ? JSON.parse(txt) : null; } catch { /* sin JSON */ }
-  if (!r.ok) throw Object.assign(new Error(j?.error?.mensaje || j?.error?.message || `VELARIS respondió ${r.status}`), { status: r.status, detalle: j?.error });
+  // requestId: con él VELARIS encuentra la llamada en sus registros.
+  if (!r.ok) throw Object.assign(new Error(j?.error?.mensaje || j?.error?.message || `VELARIS respondió ${r.status}`), { status: r.status, detalle: j?.error, requestId: r.headers.get('x-request-id') || j?.error?.requestId || null });
   return j;
 }
 
@@ -109,14 +111,18 @@ const urlImagen = (i) => (typeof i === 'string' ? i : i?.url || null);
 const imagenPrincipal = (imgs) => urlImagen((imgs || []).find((i) => i?.isMain) || (imgs || [])[0]);
 // Precio de oferta: solo si hoy está dentro de su vigencia (startsOn / endsOn, hora de El Salvador).
 const ofertaVigente = (o) => { if (!o?.amount) return false; const t = Date.now(); const d = (x) => (x ? Date.parse(x.length === 10 ? x + 'T00:00:00-06:00' : x) : NaN); return !(t < d(o.startsOn)) && !(t > d(o.endsOn) + (o.endsOn?.length === 10 ? 86400000 : 0)); };
+// Precio vigente de un producto o variante (oferta si hay) y ese mismo precio sin IVA, que es el que usa el crédito fiscal (03).
+const precioVigente = (x) => (ofertaVigente(x?.salePrice) ? x.salePrice : x?.price) || null;
+const sinIva = (pr) => (pr?.amount == null ? null : pr.amountWithoutTax ?? Math.round((pr.amount / 1.13) * 100) / 100);
 function normalizar(p) {
   const attr = (v, pref) => v.attributes?.find((a) => a.name.startsWith(pref))?.value || null;
-  const variantes = (p.variants || []).map((v) => ({ codigo: v.sku, talla: attr(v, 'TALLA'), color: attr(v, 'COLOR'), genero: attr(v, 'GENERO'), disponible: !!v.available }));
+  // Cada variante guarda su id y su precio: VELARIS factura por variante, y algunas valen distinto que su producto.
+  const variantes = (p.variants || []).map((v) => ({ id: v.id, codigo: v.sku, talla: attr(v, 'TALLA'), color: attr(v, 'COLOR'), genero: attr(v, 'GENERO'), disponible: !!v.available, precio: precioVigente(v)?.amount ?? null, precioSinIva: sinIva(precioVigente(v)) }));
   const generos = [...new Set(variantes.map((v) => GENERO[v.genero]).filter(Boolean))];
   const plan = PLAN[p.category?.code];
   return {
     id: p.id, sku: p.sku, nombre: p.name, marca: p.brand?.name || '', categoria: p.category?.name || '',
-    precio: ofertaVigente(p.salePrice) ? p.salePrice.amount : p.price?.amount, precioAnterior: ofertaVigente(p.salePrice) ? p.price?.amount : null, disponible: !!p.available, variantes,
+    precio: ofertaVigente(p.salePrice) ? p.salePrice.amount : p.price?.amount, precioAnterior: ofertaVigente(p.salePrice) ? p.price?.amount : null, precioSinIva: sinIva(precioVigente(p)), disponible: !!p.available, variantes,
     descripcion: String(p.description || p.shortDescription || '').trim().slice(0, 600),
     planes: plan ? [plan] : [], generos: generos.length ? generos : ['all'],
     imagen: imagenPrincipal(p.images) || imagenPrincipal(p.variants?.find((v) => v.images?.length)?.images),
@@ -147,7 +153,7 @@ function vistaProductoReal(p) {
   return {
     sku: p.sku, nombre: p.nombre, marca: p.marca, categoria: p.categoria, descripcion: p.descripcion || '',
     precio: p.precio, precioAnterior: p.precioAnterior, descuentoPct: p.precioAnterior ? Math.floor((1 - p.precio / p.precioAnterior) * 100) : 0,
-    disponible: p.disponible, tallas, variantes: p.variantes.map((v) => ({ codigo: v.codigo, talla: v.talla, color: v.color, disponible: v.disponible })),
+    disponible: p.disponible, tallas, variantes: p.variantes.map((v) => ({ codigo: v.codigo, talla: v.talla, color: v.color, disponible: v.disponible, precio: v.precio ?? p.precio })),
     imagen: p.imagen || m.imagen || null, bg: m.bg || '#F3E6CF', planes: p.planes, generos: p.generos,
     etiqueta: p.precioAnterior ? `−${Math.floor((1 - p.precio / p.precioAnterior) * 100)}%` : (m.etiqueta || null), etiquetaSol: p.precioAnterior ? true : !!m.etiquetaSol,
   };
@@ -212,9 +218,151 @@ const itemsLimpios = (items) => {
   return out;
 };
 
-/** Pasarela de pago SIMULADA. Se reemplaza por la integración real (p. ej. Banco Agrícola). */
-async function cobrar(monto) { return { aprobado: true, tipo: 'tarjeta-simulada', referencia: 'SIM-' + crypto.randomBytes(4).toString('hex').toUpperCase(), monto }; }
+/**
+ * Pasarela de pago SIMULADA. Se reemplaza por la integración real (p. ej. Banco Agrícola).
+ * Con la pasarela real conviene autorizar aquí, capturar cuando la factura sale y liberar la autorización en
+ * reversarCobro() si no sale. `pedido` sirve de llave para que un reintento no cobre dos veces.
+ * formaPagoHacienda es el código CAT-017 que pide la factura: 02 débito, 03 crédito (la pasarela dirá cuál fue).
+ */
+async function cobrar(monto, pedido) { return { aprobado: true, tipo: 'tarjeta-simulada', formaPagoHacienda: '03', referencia: 'SIM-' + crypto.randomBytes(4).toString('hex').toUpperCase(), monto, pedido }; }
+async function reversarCobro(pago) { console.warn(`[pago] reverso simulado de ${pago.referencia} ($${pago.monto}) del pedido ${pago.pedido}`); }
 let secuencia = 0;
+
+/* ----- Facturación con la API real -----
+ * Pedido del sitio → factura (01) o crédito fiscal (03) en VELARIS. VELARIS pone los precios, descuenta el inventario
+ * y la manda a Hacienda en la misma llamada. Docs: https://developers.velarisapp.com/?lang=es#invoices
+ * Con las credenciales reales, cada pedido es una factura REAL ante Hacienda: para probar, npm run dev:catalogo. */
+const ESTADO_FACTURA = { accepted: 'aceptada', pending: 'pendiente', rejected: 'rechazada', voided: 'anulada' };
+const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
+const centavos = (n) => Math.round(Number(n) * 100);
+const texto = (v, max) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
+const digitos = (v) => String(v ?? '').replace(/\D/g, '');
+function duiValido(v) {
+  const d = digitos(v); if (d.length !== 9) return false;
+  let s = 0; for (let i = 0; i < 8; i++) s += Number(d[i]) * (9 - i);
+  return (10 - (s % 10)) % 10 === Number(d[8]);
+}
+// Mismo número de pedido para la misma claveOrden: VELARIS lo usa para no facturar dos veces.
+const numeroDePedido = (clave) => 'WEB-' + (typeof clave === 'string' && clave.length >= 8 && clave.length <= 100
+  ? crypto.createHash('sha256').update(clave).digest('hex').slice(0, 16) : crypto.randomBytes(8).toString('hex')).toUpperCase();
+
+function lineasFactura(lineas) {
+  const out = [];
+  for (const l of lineas) {
+    const pr = cache.productos.get(l.sku);
+    if (!pr) return { status: 404, error: { codigo: 'SKU_NO_EXISTE', mensaje: 'Un producto del carrito ya no existe.', producto: { sku: l.sku } } };
+    const v = l.variante ? pr.variantes.find((x) => x.codigo === l.variante) : (pr.variantes.length === 1 ? pr.variantes[0] : null);
+    if (l.variante && !v) return { status: 404, error: { codigo: 'VARIANTE_NO_EXISTE', mensaje: 'Una talla o color del carrito ya no existe.', producto: { sku: l.sku, variante: l.variante } } };
+    if (!v && pr.variantes.length) return { status: 400, error: { codigo: 'FALTA_VARIANTE', mensaje: `Elige la talla o el color de ${pr.nombre}.`, producto: { sku: l.sku } } };
+    out.push({ sku: pr.sku, variante: v?.codigo || null, productId: v?.id || pr.id, cantidad: l.cantidad, precio: v?.precio ?? pr.precio, precioSinIva: v?.precioSinIva ?? pr.precioSinIva });
+  }
+  return { lineas: out };
+}
+// Lo que VELARIS va a cobrar: en la 01 el precio con IVA; en la 03 el precio sin IVA más el 13 %.
+// (A un gran contribuyente VELARIS además le retiene 1 % arriba de $100; si pasa, responde TOTAL_MISMATCH.)
+function totalEsperado(tipo, lineas) {
+  if (tipo === '01') return lineas.reduce((a, l) => a + centavos(l.precio) * l.cantidad, 0) / 100;
+  const sub = lineas.reduce((a, l) => a + centavos(l.precioSinIva) * l.cantidad, 0);
+  return (sub + Math.round(sub * 0.13)) / 100;
+}
+function clienteFactura(tipo, c) {
+  const falta = (campo, mensaje) => ({ error: { codigo: 'DATOS_DE_FACTURA', campo, mensaje } });
+  const d = c.direccion || {};
+  const address = { department: texto(d.departamento, 2), municipality: texto(d.municipio, 2), district: texto(d.distrito, 2), line: texto(d.detalle, 200) };
+  const nombre = texto(c.nombre, 200); const correo = texto(c.correo, 120); const telefono = texto(c.telefono, 30);
+  if (!nombre) return falta('cliente.nombre', tipo === '03' ? 'Falta la razón social.' : 'Falta el nombre.');
+  if (!correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) return falta('cliente.correo', 'El correo no es válido: ahí llega la factura.');
+  if (Object.values(address).some((x) => !x)) return falta('cliente.direccion', 'Falta la dirección completa: departamento, municipio, distrito y detalle.');
+  const extra = { ...(telefono ? { phone: telefono } : {}), address };
+  if (tipo === '01') {
+    const tipoDocumento = texto(c.tipoDocumento, 2) || '13'; const documento = texto(c.documento, 20);
+    if (!documento) return falta('cliente.documento', 'Falta el número de documento.');
+    if (tipoDocumento === '13' && !duiValido(documento)) return falta('cliente.documento', 'El DUI no es válido.');
+    return { cliente: { documentType: tipoDocumento, document: documento, name: nombre, email: correo, ...extra } };
+  }
+  const nit = digitos(c.nit); const nrc = digitos(c.nrc); const actividad = texto(c.actividad, 10);
+  if (nit.length !== 14 && nit.length !== 9) return falta('cliente.nit', 'El NIT debe tener 14 dígitos (o 9 si es DUI homologado).');
+  if (nrc.length < 2 || nrc.length > 8) return falta('cliente.nrc', 'El NRC debe tener de 2 a 8 dígitos.');
+  if (!actividad) return falta('cliente.actividad', 'Falta la actividad económica.');
+  const comercial = texto(c.nombreComercial, 200);
+  return { cliente: { nit, nrc, name: nombre, ...(comercial ? { tradeName: comercial } : {}), activityCode: actividad, email: correo, ...extra } };
+}
+async function buscarFactura(numeroPedido) {
+  try { return await velaris('GET', '/invoices', { query: { orderNumber: numeroPedido } }); }
+  catch (e) { if (e.status === 404) return null; throw e; }
+}
+// Si se corta la conexión o VELARIS dice IN_PROGRESS, se repite el mismo pedido: nunca duplica.
+async function crearFactura(body) {
+  for (let intento = 1; ; intento++) {
+    try { return await velaris('POST', '/invoices', { body, timeout: 30000 }); }
+    catch (e) {
+      const repetir = (e.status === 503 && !e.detalle) || e.detalle?.code === 'IN_PROGRESS' || e.detalle?.retryable === true;
+      if (!repetir || intento >= 3) throw e;
+      await dormir(3000);
+    }
+  }
+}
+// Sin datos del cliente: quien tenga el número de pedido solo ve el estado, el total y los productos.
+const vistaFactura = (f) => ({
+  numeroPedido: f.orderNumber, estado: ESTADO_FACTURA[f.status] || f.status, tipo: f.documentType, total: f.total,
+  factura: { numeroControl: f.controlNumber || null, codigoGeneracion: f.generationCode || null, consultaHacienda: f.consultUrl || null, fecha: f.issuedAt || null },
+  lineas: (f.lines || []).map((l) => ({ sku: l.sku, nombre: l.name, cantidad: l.quantity, precioUnitario: l.unitPrice, total: l.total })),
+  ...(f.message && f.status !== 'accepted' ? { detalle: f.message } : {}),
+});
+const MENSAJE_FACTURA = {
+  OUT_OF_STOCK: 'Uno de los productos se agotó. Revisa tu carrito.',
+  TOTAL_MISMATCH: 'Los precios cambiaron. Revisa tu carrito y vuelve a intentar.',
+  HACIENDA_REJECTED: 'Hacienda rechazó la factura. Revisa tus datos y vuelve a intentar.',
+  VALIDATION_ERROR: 'Revisa tus datos de facturación.',
+  VARIANT_REQUIRED: 'Elige la talla o el color de cada producto.',
+  PRODUCT_NOT_FOUND: 'Un producto del carrito ya no está a la venta.',
+  PRODUCT_NOT_FOR_SALE: 'Un producto del carrito ya no está a la venta.',
+  ORDER_NUMBER_CONFLICT: 'Este pedido ya se registró con otros productos. Vuelve a abrir el pago.',
+};
+const CAMPOS = { customer: 'cliente', name: 'nombre', email: 'correo', phone: 'telefono', documentType: 'tipoDocumento', document: 'documento', address: 'direccion', department: 'departamento', municipality: 'municipio', district: 'distrito', line: 'detalle', tradeName: 'nombreComercial', activityCode: 'actividad' };
+function errorFactura(res, e, numeroPedido, lineas) {
+  const d = e.detalle || {}; const field = typeof d.field === 'string' ? d.field : '';
+  // VELARIS señala el producto por su id o por su posición en items: se traduce al sku y la variante del carrito.
+  const i = field.match(/^items\[(\d+)\]/); const l = i ? lineas[Number(i[1])] : lineas.find((x) => field === x.productId);
+  const campo = field && !l ? field.split('.').map((x) => CAMPOS[x] ?? x).join('.') : null;
+  console.warn(`[factura] ${numeroPedido} no salió: ${d.code || e.status} ${d.message || e.message} ${e.requestId || ''}`);
+  return json(res, [400, 404, 409, 422].includes(e.status) ? e.status : 502, { numeroPedido, error: {
+    codigo: d.code || 'FACTURA_NO_CREADA', mensaje: MENSAJE_FACTURA[d.code] || 'No pudimos crear la factura. Intenta de nuevo en un momento.',
+    ...(d.message ? { detalle: d.message } : {}), ...(campo ? { campo } : {}), ...(l ? { producto: { sku: l.sku, variante: l.variante } } : {}),
+  } });
+}
+async function pedidoConFactura(req, res) {
+  const b = await cuerpo(req);
+  if (b.tipo !== undefined && b.tipo !== '01' && b.tipo !== '03') return json(res, 400, { error: { mensaje: 'tipo debe ser "01" (factura) o "03" (crédito fiscal).' } });
+  const tipo = b.tipo || '01';
+  const limpias = itemsLimpios(b.lineas); if (!limpias) return json(res, 400, { error: { mensaje: 'lineas inválidas' } });
+  if (!cache.productos.size) await mantener();
+  const L = lineasFactura(limpias); if (L.error) return json(res, L.status, { error: L.error });
+  const C = clienteFactura(tipo, b.cliente || {}); if (C.error) return json(res, 400, { error: C.error });
+  const numeroPedido = numeroDePedido(b.claveOrden);
+  // El navegador reintentó un pedido que ya tiene factura: se devuelve esa misma, sin cobrar otra vez.
+  const previa = await buscarFactura(numeroPedido);
+  if (previa && previa.status !== 'rejected') return json(res, 200, vistaFactura(previa));
+  const total = totalEsperado(tipo, L.lineas);
+  const pago = await cobrar(total, numeroPedido);
+  if (!pago.aprobado) return json(res, 402, { numeroPedido, error: { codigo: 'PAGO_RECHAZADO', mensaje: 'El pago no fue aprobado.' } });
+  const body = {
+    orderNumber: numeroPedido, documentType: tipo, customer: C.cliente,
+    items: L.lineas.map((l) => ({ productId: l.productId, quantity: l.cantidad })),
+    paymentMethod: pago.formaPagoHacienda, paymentReference: String(pago.referencia).slice(0, 50), expectedTotal: total,
+  };
+  let f;
+  try { f = await crearFactura(body); }
+  catch (e) {
+    // Un 4xx de VELARIS (salvo IN_PROGRESS) significa que no se creó nada: se libera el cobro.
+    if (e.status >= 400 && e.status < 500 && e.detalle?.code !== 'IN_PROGRESS') { await reversarCobro(pago); return errorFactura(res, e, numeroPedido, L.lineas); }
+    // No sabemos si quedó creada: el cobro NO se reversa y el estado se consulta con GET /api/pedidos/{numeroPedido}.
+    console.error(`[factura] ${numeroPedido} sin confirmar (cobro ${pago.referencia}): ${e.message} ${e.requestId || ''}`);
+    return json(res, 503, { numeroPedido, error: { codigo: 'FACTURA_SIN_CONFIRMAR', mensaje: 'Recibimos tu pago pero todavía no confirmamos la factura. Consulta tu pedido en unos minutos.' } });
+  }
+  console.log(`[factura] ${numeroPedido} ${f.status} ${f.controlNumber || ''} $${f.total}`);
+  return json(res, f.status === 'pending' ? 202 : 201, vistaFactura(f));
+}
 
 async function api(req, res, url) {
   const ip = req.socket.remoteAddress || '-';
@@ -232,8 +380,8 @@ async function api(req, res, url) {
   }
   if (limiteIP(ip)) return json(res, 429, { error: { codigo: 'DEMASIADAS_SOLICITUDES', mensaje: 'Demasiadas solicitudes. Espera un minuto.' } }, { 'Retry-After': '60' });
 
-  // La API real de VELARIS es solo de catálogo: todavía no permite apartar ni vender.
-  if (MODO === 'catalogo' && /^\/api\/(reservas|pedidos)(\/|$)/.test(p)) return json(res, 501, { error: { codigo: 'COMPRA_NO_DISPONIBLE', mensaje: 'La compra en línea todavía no está disponible.' } });
+  // La API real de VELARIS no permite apartar existencias: el inventario sale cuando se factura el pedido.
+  if (MODO === 'catalogo' && /^\/api\/reservas(\/|$)/.test(p)) return json(res, 501, { error: { codigo: 'RESERVA_NO_DISPONIBLE', mensaje: 'VELARIS no permite apartar productos; el inventario sale al facturar.' } });
   try {
     if (req.method === 'POST' && p === '/api/reservas') {
       const b = await cuerpo(req); const items = itemsLimpios(b.items);
@@ -247,6 +395,11 @@ async function api(req, res, url) {
       const r = await velaris('DELETE', `/reservas/${m[1]}`, { idem: crypto.randomUUID() });
       refrescarSkus([...cache.productos.keys()]).catch(() => {});
       return json(res, 200, r);
+    }
+    if (req.method === 'POST' && p === '/api/pedidos' && MODO === 'catalogo') return await pedidoConFactura(req, res);
+    if (req.method === 'GET' && MODO === 'catalogo' && (m = p.match(/^\/api\/pedidos\/([\w-]+)$/))) {
+      const f = await buscarFactura(m[1]);
+      return f ? json(res, 200, vistaFactura(f)) : json(res, 404, { error: { codigo: 'PEDIDO_NO_EXISTE', mensaje: 'No encontramos ese pedido.' } });
     }
     if (req.method === 'POST' && p === '/api/pedidos') {
       const b = await cuerpo(req); const lineas = itemsLimpios(b.lineas);

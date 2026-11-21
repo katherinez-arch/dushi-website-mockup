@@ -6,6 +6,11 @@ const MP = 4110; const WP = 4100;
 const MOCK = `http://127.0.0.1:${MP}`; const WEB = `http://127.0.0.1:${WP}`;
 const env = { ...process.env, VELARIS_PORT: String(MP), PORT: String(WP), VELARIS_URL: MOCK, VELARIS_LOG: '0', VELARIS_RESERVA_MIN: '0.05', STOCK_POLL_MS: '600000' };
 const procs = ['velaris-mock.js', 'web-backend.js'].map((f) => spawn(process.execPath, [f], { cwd: __dirname, env, stdio: ['ignore', 'ignore', 'inherit'] }));
+// Segundo par: VELARIS con la forma de la API real (catálogo + facturas) y un backend en modo catálogo.
+const MP2 = 4111; const WP2 = 4101;
+const MOCK2 = `http://127.0.0.1:${MP2}`; const WEB2 = `http://127.0.0.1:${WP2}`;
+const env2 = { ...env, VELARIS_CATALOGO_PORT: String(MP2), PORT: String(WP2), VELARIS_URL: MOCK2, VELARIS_API: 'catalogo', VELARIS_CLIENT_ID: '', VELARIS_CLIENT_SECRET: '' };
+procs.push(...['velaris-catalogo-mock.js', 'web-backend.js'].map((f) => spawn(process.execPath, [f], { cwd: __dirname, env: env2, stdio: ['ignore', 'ignore', 'ignore'] })));
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 const J = async (url, o = {}) => { const r = await fetch(url, o); let b = null; try { b = await r.json(); } catch { /* */ } return { status: r.status, body: b, headers: r.headers }; };
 let tok; let n = 0;
@@ -17,7 +22,7 @@ const ok = (m) => console.log('  ✓ ' + m);
 const prueba = async (nombre, fn) => { n++; console.log(`\n${nombre}`); await fn(); };
 
 (async () => {
-  for (let i = 0; i < 50; i++) { try { await fetch(MOCK + '/_mock/kardex'); await fetch(WEB + '/api/salud'); break; } catch { await dormir(100); } }
+  for (let i = 0; i < 50; i++) { try { await fetch(MOCK + '/_mock/kardex'); await fetch(WEB + '/api/salud'); await fetch(MOCK2 + '/_mock/facturas'); await fetch(WEB2 + '/api/salud'); break; } catch { await dormir(100); } }
   await dormir(600);
   const CAM = 'DSH-CAM-001-M'; const MAL = 'RUM-MAL-001-ÚNICA';
 
@@ -100,6 +105,61 @@ const prueba = async (nombre, fn) => { n++; console.log(`\n${nombre}`); await fn
     assert.equal((await fetch(WEB + '/index.html')).status, 200); ok('sirve el sitio');
     assert.equal((await fetch(WEB + '/server/web-backend.js')).status, 404); assert.equal((await fetch(WEB + '/server/data/products.json')).status, 404); ok('no expone la carpeta server');
     assert.equal((await fetch(WEB + '/%2e%2e/%2e%2e/etc/hosts')).status, 404); ok('bloquea rutas fuera del sitio');
+  });
+
+  await prueba('7. Facturación con la API real (VELARIS de prueba, nada llega a Hacienda)', async () => {
+    const pedir = (b) => J(WEB2 + '/api/pedidos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+    const mock = (ruta, b) => J(MOCK2 + ruta, { method: 'POST', body: JSON.stringify(b || {}) });
+    const cuantas = async () => (await J(MOCK2 + '/_mock/facturas')).body.length;
+    const dir = { departamento: '06', municipio: '23', distrito: '03', detalle: 'Calle El Mirador #45, Col. Escalón' };
+    const ana = { nombre: 'Ana Pérez', correo: 'ana@correo.com', tipoDocumento: '13', documento: '04567890-3', direccion: dir };
+    const pulsera = { sku: 'PULSERA-MADERA', cantidad: 1 };
+
+    assert.equal((await J(WEB2 + '/api/salud')).body.productos, 4); ok('catálogo de la API real cargado (4 productos)');
+    const chu = (await J(WEB2 + '/api/catalogo')).body.productos.find((p) => p.sku === 'CHUMPA-IMPER');
+    assert.equal(chu.variantes[0].precio, 39); ok('cada variante trae su precio');
+    assert.equal((await J(WEB2 + '/api/reservas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: [pulsera] }) })).status, 501); ok('apartar no existe en la API real → 501');
+
+    const a = await pedir({ claveOrden: 'orden-prueba-0001', lineas: [{ sku: 'TOALLA-RAYAS', variante: 'TOALLA-RAYAS-FAM-AZUL', cantidad: 2, precioUnitario: 0.01 }, pulsera], cliente: ana });
+    assert.equal(a.status, 201); assert.equal(a.body.estado, 'aceptada'); assert.equal(a.body.tipo, '01'); assert.equal(a.body.total, 27);
+    assert.match(a.body.factura.numeroControl, /^DTE-01-/); assert.ok(a.body.factura.consultaHacienda); ok('factura 01 aceptada por $27.00; el precio lo puso VELARIS, no el navegador');
+    const n0 = await cuantas();
+    const a2 = await pedir({ claveOrden: 'orden-prueba-0001', lineas: [{ sku: 'TOALLA-RAYAS', variante: 'TOALLA-RAYAS-FAM-AZUL', cantidad: 2 }, pulsera], cliente: ana });
+    assert.equal(a2.status, 200); assert.equal(a2.body.numeroPedido, a.body.numeroPedido); assert.equal(await cuantas(), n0); ok('reintento con la misma claveOrden: la misma factura, sin cobrar otra vez');
+    const g = await J(WEB2 + '/api/pedidos/' + a.body.numeroPedido);
+    assert.equal(g.body.estado, 'aceptada'); assert.ok(!JSON.stringify(g.body).includes('4567890') && !JSON.stringify(g.body).includes('ana@')); ok('consultar el pedido no muestra datos del cliente');
+    assert.equal((await J(WEB2 + '/api/pedidos/WEB-NOEXISTE')).status, 404); ok('pedido inexistente → 404');
+
+    const dui = await pedir({ claveOrden: 'orden-prueba-0002', lineas: [pulsera], cliente: { ...ana, documento: '04567890-4' } });
+    assert.equal(dui.status, 400); assert.equal(dui.body.error.campo, 'cliente.documento'); ok('DUI inválido → 400, antes de cobrar');
+    const sinDir = await pedir({ claveOrden: 'orden-prueba-0003', lineas: [pulsera], cliente: { ...ana, direccion: { departamento: '06' } } });
+    assert.equal(sinDir.status, 400); assert.equal(sinDir.body.error.campo, 'cliente.direccion'); ok('dirección incompleta → 400');
+    const sinVar = await pedir({ claveOrden: 'orden-prueba-0004', lineas: [{ sku: 'TOALLA-RAYAS', cantidad: 1 }], cliente: ana });
+    assert.equal(sinVar.status, 400); assert.equal(sinVar.body.error.codigo, 'FALTA_VARIANTE'); ok('producto con colores o tallas sin elegir → 400');
+    assert.equal(await cuantas(), n0); ok('ninguno de esos errores llegó a VELARIS');
+
+    const roble = { nombre: 'Comercial El Roble, S.A. de C.V.', nombreComercial: 'El Roble', correo: 'compras@elroble.com', nit: '0614-010190-101-1', nrc: '123456-7', actividad: '46900', direccion: dir };
+    const cf = await pedir({ claveOrden: 'orden-prueba-0005', tipo: '03', lineas: [{ sku: 'CHUMPA-IMPER', variante: 'CHUMPA-IMPER-HOMBRE-M', cantidad: 1 }, pulsera], cliente: roble });
+    assert.equal(cf.status, 201); assert.equal(cf.body.tipo, '03'); assert.equal(cf.body.total, 41.99); ok('crédito fiscal 03: precios sin IVA más 13 % ($41.99; en 01 serían $42.00)');
+    const cfMal = await pedir({ claveOrden: 'orden-prueba-0006', tipo: '03', lineas: [pulsera], cliente: { ...roble, nrc: '' } });
+    assert.equal(cfMal.status, 400); assert.equal(cfMal.body.error.campo, 'cliente.nrc'); ok('03 sin NRC → 400');
+
+    const agot = await pedir({ claveOrden: 'orden-prueba-0007', lineas: [{ sku: 'MALETA-MANO', cantidad: 2 }], cliente: ana });
+    assert.equal(agot.status, 409); assert.equal(agot.body.error.codigo, 'OUT_OF_STOCK'); assert.equal(agot.body.error.producto.sku, 'MALETA-MANO'); ok('sin existencia → 409 con el producto agotado; no se facturó');
+
+    await mock('/_mock/hacienda', { modo: 'pendiente' });
+    const pe = await pedir({ claveOrden: 'orden-prueba-0008', lineas: [pulsera], cliente: ana });
+    assert.equal(pe.status, 202); assert.equal(pe.body.estado, 'pendiente');
+    await mock('/_mock/aceptar-pendientes');
+    assert.equal((await J(WEB2 + '/api/pedidos/' + pe.body.numeroPedido)).body.estado, 'aceptada'); ok('Hacienda tarda: queda pendiente y después se consulta aceptada');
+    await mock('/_mock/hacienda', { modo: 'rechaza' });
+    const re = await pedir({ claveOrden: 'orden-prueba-0009', lineas: [pulsera], cliente: ana });
+    assert.equal(re.status, 422); assert.equal(re.body.error.codigo, 'HACIENDA_REJECTED'); assert.ok(re.body.error.detalle); ok('Hacienda rechaza → 422 con el motivo');
+    await mock('/_mock/hacienda', { modo: 'acepta' });
+    const re2 = await pedir({ claveOrden: 'orden-prueba-0009', lineas: [pulsera], cliente: ana });
+    assert.equal(re2.status, 201); assert.equal(re2.body.numeroPedido, re.body.numeroPedido); ok('corregido, se reenvía con el mismo número de pedido');
+    await mock('/_mock/anular/' + a.body.numeroPedido);
+    assert.equal((await J(WEB2 + '/api/pedidos/' + a.body.numeroPedido)).body.estado, 'anulada'); ok('si la empresa la anula, el pedido aparece anulado');
   });
 
   console.log(`\n✔ ${n} grupos de pruebas pasaron`);
